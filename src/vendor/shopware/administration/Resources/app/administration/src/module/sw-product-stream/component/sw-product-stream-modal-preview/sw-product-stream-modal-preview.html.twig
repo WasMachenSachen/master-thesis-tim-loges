@@ -1,0 +1,140 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_product_stream_modal_preview %}
+<sw-modal
+    class="sw-product-stream-modal-preview"
+    :title="`${$tc('sw-product-stream.previewModal.title')} (${total || 0})`"
+    :is-loading="isLoading"
+    variant="full"
+    @modal-close="closeModal"
+>
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_product_stream_modal_preview_content %}
+    <div class="sw-product-stream-modal-preview__content">
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_product_stream_modal_preview_content_header %}
+        <sw-container class="sw-product-stream-modal-preview__content-header">
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_product_stream_modal_preview_search_field_label %}
+            <sw-label class="sw-product-stream-modal-preview__search-field-label">
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_stream_modal_preview_search_field %}
+                <sw-simple-search-field
+                    v-model="searchTerm"
+                    variant="form"
+                    :delay="750"
+                    class="sw-product-stream-modal-preview__search-field"
+                    @search-term-change="onSearchTermChange"
+                />
+                {% endblock %}
+            </sw-label>
+            {% endblock %}
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_product_stream_modal_preview_sales_channel_field_label %}
+            <sw-label class="sw-product-stream-modal-preview__sales-channel-field-label">
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_stream_modal_preview_sales_channel_field %}
+                <sw-entity-single-select
+                    v-model="selectedSalesChannel"
+                    :disabled="isLoading"
+                    entity="sales_channel"
+                    class="sw-product-stream-modal-preview__sales-channel-field"
+                    :label="$tc('sw-settings.system-config.labelSalesChannelSelect')"
+                    @change="onSalesChannelChange"
+                />
+                {% endblock %}
+            </sw-label>
+            {% endblock %}
+        </sw-container>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_product_stream_modal_preview_grid %}
+        <sw-data-grid
+            v-if="total"
+            :data-source="products"
+            :columns="productColumns"
+            :show-selection="false"
+            :show-actions="false"
+            :show-previews="true"
+            :is-loading="isLoading"
+            full-page
+        >
+
+            <template #column-name="{ item, column }">
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_stream_modal_preview_grid_column_name %}
+                <router-link :to="{ name: column.routerLink, params: { id: item.id } }">
+                    <sw-product-variant-info :variations="item.variation">
+                        {{ item.name || item.translated.name }}
+                    </sw-product-variant-info>
+                </router-link>
+                {% endblock %}
+            </template>
+
+            <template #column-active="{ item }">
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_stream_modal_preview_grid_column_active %}
+                <sw-data-grid-column-boolean
+                    :value="item.active"
+                    :is-inline-edit="false"
+                />
+                {% endblock %}
+            </template>
+
+            <template #column-price="{ item }">
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_stream_modal_preview_grid_column_price %}
+                {{ getPriceForDefaultCurrency(item).unitPrice | currency('EUR') }}
+                {% endblock %}
+            </template>
+
+            <template #column-stock="{ item }">
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_stream_modal_preview_grid_column_stock %}
+                {{ item.stock }}
+                <sw-color-badge :variant="item.stock | stockColorVariant" />
+                {% endblock %}
+            </template>
+
+            <template #pagination>
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_stream_modal_preview_grid_pagination %}
+                <sw-pagination
+                    v-bind="{ total, page, limit }"
+                    :total-visible="7"
+                    :auto-hide="false"
+                    @page-change="onPageChange"
+                />
+                {% endblock %}
+            </template>
+        </sw-data-grid>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_product_stream_modal_preview_empty_state %}
+        <sw-empty-state
+            v-if="!total && !isLoading"
+            :absolute="false"
+            :title="$tc('sw-product-stream.previewModal.empty')"
+        />
+        {% endblock %}
+    </div>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_product_stream_modal_preview_footer %}
+    <template #modal-footer>
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_product_stream_modal_preview_close_button %}
+        <sw-button
+            class="sw-product-stream-modal-preview__close-action"
+            variant="primary"
+            @click.prevent="closeModal"
+        >
+            {{ $tc('sw-product-stream.previewModal.close') }}
+        </sw-button>
+        {% endblock %}
+    </template>
+    {% endblock %}
+</sw-modal>
+{% endblock %}

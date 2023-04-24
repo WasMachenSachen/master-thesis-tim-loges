@@ -1,0 +1,455 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_customer_list %}
+<sw-page class="sw-customer-list">
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_customer_list_search_bar %}
+    <template #search-bar>
+        <sw-search-bar
+            initial-search-type="customer"
+            :initial-search="term"
+            @search="onSearch"
+        />
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_customer_list_smart_bar_header %}
+    <template #smart-bar-header>
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_customer_list_smart_bar_header_title %}
+        <h2>
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_customer_list_smart_bar_header_title_text %}
+            {{ $tc('sw-customer.list.textCustomers') }}
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_customer_list_smart_bar_header_amount %}
+            <span
+                v-if="!isLoading"
+                class="sw-page__smart-bar-amount"
+            >
+                ({{ total }})
+            </span>
+            {% endblock %}
+        </h2>
+        {% endblock %}
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_customer_list_smart_bar_actions %}
+    <template #smart-bar-actions>
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_customer_list_smart_bar_actions_add %}
+        <sw-button
+            v-tooltip="{
+                message: $tc('sw-privileges.tooltip.warning'),
+                disabled: acl.can('customer.creator'),
+                showOnDisabledElements: true
+            }"
+            class="sw-customer-list__button-create"
+            variant="primary"
+            :disabled="!acl.can('customer.creator')"
+            :router-link="{ name: 'sw.customer.create' }"
+        >
+            {{ $tc('sw-customer.list.buttonAddCustomer') }}
+        </sw-button>
+        {% endblock %}
+    </template>
+    {% endblock %}
+
+    <template #language-switch>
+        <sw-language-switch @on-change="onChangeLanguage" />
+    </template>
+
+    <template #content>
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_customer_list_content %}
+        <div class="sw-customer-list__content">
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_customer_list_grid %}
+            <sw-entity-listing
+                v-if="isLoading || (customers && entitySearchable)"
+                ref="swCustomerGrid"
+                class="sw-customer-list-grid"
+                identifier="sw-customer-list"
+                :items="customers"
+                :columns="customerColumns"
+                :repository="customerRepository"
+                :sort-by="currentSortBy"
+                :sort-direction="sortDirection"
+                detail-route="sw.customer.detail"
+                :show-selection="acl.can('customer.deleter')"
+                :allow-inline-edit="acl.can('customer.editor')"
+                :allow-bulk-edit="acl.can('customer.editor')"
+                :is-loading="isLoading"
+                :disable-data-fetching="true"
+                @selection-change="updateSelection"
+                @inline-edit-save="onInlineEditSave"
+                @page-change="onPageChange"
+                @column-sort="onSortColumn"
+                @bulk-edit-modal-open="onBulkEditModalOpen"
+            >
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_customer_list_grid_columns %}
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_list_grid_columns_name_preview %}
+                <template #preview-firstName="{ item, compact }">
+                    <sw-avatar
+                        :size="compact ? '32px' : '48px'"
+                        :source-context="item"
+                        :first-name="item.firstName"
+                        :last-name="item.lastName"
+                    />
+                </template>
+                {% endblock %}
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_customer_list_grid_columns_name %}
+                <template #column-firstName="{ item, compact, isInlineEdit }">
+
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_customer_list_grid_inline_edit_name %}
+                    <template v-if="isInlineEdit">
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_list_grid_inline_edit_first_name %}
+                        <sw-text-field
+                            v-model="item.firstName"
+                            class="sw-customer-list__inline-edit-first-name"
+                            :size="compact ? 'small' : 'default'"
+                        />
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_list_grid_inline_edit_last_name %}
+                        <sw-text-field
+                            v-model="item.lastName"
+                            class="sw-customer-list__inline-edit-last-name"
+                            :size="compact ? 'small' : 'default'"
+                        />
+                        {% endblock %}
+                    </template>
+                    {% endblock %}
+
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_customer_list_grid_columns_name_link %}
+                    <router-link
+                        v-else
+                        :to="{ name: 'sw.customer.detail', params: { id: item.id }, query: { edit: false } }"
+                    >
+                        {{ item.lastName }}, {{ item.firstName }}
+                    </router-link>
+                    {% endblock %}
+
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_customer_list_grid_columns_name_guest_label %}
+                    <sw-label
+                        v-if="!isInlineEdit && item.guest"
+                        appearance="pill"
+                        size="small"
+                        class="sw-customer-list__metadata-customer-guest-label"
+                    >
+                        {{ $tc('sw-customer.list.columnNameGuestLabel') }}
+                    </sw-label>
+                    {% endblock %}
+
+                    <sw-label
+                        v-if="item.createdById"
+                        appearance="pill"
+                        size="small"
+                        class="sw-customer-list__created-by-admin-label"
+                    >
+                        {{ $tc('sw-customer.list.labelCreatedByAdmin') }}
+                    </sw-label>
+                </template>
+                {% endblock %}
+                {% endblock %}
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_customer_list_grid_columns_group %}
+                <template #column-group="{ item, compact, isInlineEdit }">
+                    <sw-label
+                        v-if="item.requestedGroup"
+                        class="sw-customer-list__requested-group-label"
+                        variant="warning"
+                        appearance="pill"
+                    >
+                        {{ $tc('sw-customer.list.columnGroupRequested') }} {{ item.requestedGroup.translated.name }}
+                    </sw-label>
+                    <sw-label
+                        v-else
+                        size="default"
+                        appearance="pill"
+                    >
+                        {{ item.group.translated.name }}
+                    </sw-label>
+                </template>
+                {% endblock %}
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_customer_list_grid_columns_boundSalesChannel %}
+                <template #column-boundSalesChannelId="{ item }">
+                    {{ item.boundSalesChannelId ? item.salesChannel.translated.name : $tc('sw-customer.list.emptyBoundSalesChannel') }}
+                </template>
+                {% endblock %}
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_customer_list_grid_columns_active %}
+                <template #column-active="{ item, isInlineEdit }">
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_customer_list_grid_columns_active_inline_edit %}
+                    <template v-if="isInlineEdit">
+                        <sw-checkbox-field v-model="item.active" />
+                    </template>
+                    {% endblock %}
+
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_customer_list_grid_columns_active_content %}
+                    <template v-else>
+                        <sw-icon
+                            v-if="item.active"
+                            name="regular-checkmark-xs"
+                            small
+                            class="is--active"
+                        />
+                        <sw-icon
+                            v-else
+                            name="regular-times-s"
+                            small
+                            class="is--inactive"
+                        />
+                    </template>
+                    {% endblock %}
+                </template>
+                {% endblock %}
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_customer_list_grid_columns_actions %}
+                <template #actions="{ item }">
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_customer_list_grid_columns_actions_view %}
+                    <sw-context-menu-item
+                        class="sw-customer-list__view-action"
+                        :router-link="{ name: 'sw.customer.detail', params: { id: item.id }, query: { edit: false } }"
+                    >
+                        {{ $tc('sw-customer.list.contextMenuView') }}
+                    </sw-context-menu-item>
+                    {% endblock %}
+
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_customer_list_grid_columns_actions_edit %}
+                    <sw-context-menu-item
+                        class="sw-customer-list__edit-action"
+                        :disabled="!acl.can('customer.editor')"
+                        :router-link="{ name: 'sw.customer.detail.base', params: { id: item.id }, query: { edit: true } }"
+                    >
+                        {{ $tc('sw-customer.list.contextMenuEdit') }}
+                    </sw-context-menu-item>
+                    {% endblock %}
+
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_customer_list_grid_columns_actions_delete %}
+                    <sw-context-menu-item
+                        class="sw-customer-list__delete-action"
+                        variant="danger"
+                        :disabled="!acl.can('customer.deleter')"
+                        @click="onDelete(item.id)"
+                    >
+                        {{ $tc('sw-customer.list.contextMenuDelete') }}
+                    </sw-context-menu-item>
+                    {% endblock %}
+                </template>
+                {% endblock %}
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_customer_list_grid_action_modals %}
+                <template #action-modals="{ item }">
+
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_customer_list_delete_modal %}
+                    <sw-modal
+                        v-if="showDeleteModal === item.id"
+                        :title="$tc('global.default.warning')"
+                        variant="small"
+                        @modal-close="onCloseDeleteModal"
+                    >
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_list_delete_modal_confirm_delete_text %}
+                        <p class="sw-customer-list__confirm-delete-text">
+                            {{ $tc('sw-customer.list.textDeleteConfirm', 0, { name: `${item.firstName} ${item.lastName}` }) }}
+                        </p>
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_list_delete_modal_footer %}
+                        <template #modal-footer>
+
+                            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                            {% block sw_customer_list_delete_modal_cancel %}
+                            <sw-button
+                                size="small"
+                                @click="onCloseDeleteModal"
+                            >
+                                {{ $tc('sw-customer.list.buttonCancel') }}
+                            </sw-button>
+                            {% endblock %}
+
+                            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                            {% block sw_customer_list_delete_modal_confirm %}
+                            <sw-button
+                                variant="danger"
+                                size="small"
+                                @click="onConfirmDelete(item.id)"
+                            >
+                                {{ $tc('sw-customer.list.buttonDelete') }}
+                            </sw-button>
+                            {% endblock %}
+                        </template>
+                        {% endblock %}
+                    </sw-modal>
+                    {% endblock %}
+                </template>
+                {% endblock %}
+
+                <template #pagination>
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_order_list_grid_pagination %}
+                    <sw-pagination
+                        :page="page"
+                        :limit="limit"
+                        :total="total"
+                        :total-visible="7"
+                        @page-change="onPageChange"
+                    />
+                    {% endblock %}
+                </template>
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_customer_list_bulk_edit_modal %}
+                <template
+                    #bulk-edit-modal="{ selection }"
+                >
+                    <sw-bulk-edit-modal
+                        v-if="showBulkEditModal"
+                        ref="bulkEditModal"
+                        class="sw-customer-bulk-edit-modal"
+                        :selection="selection"
+                        :bulk-grid-edit-columns="customerColumns"
+                        @edit-items="onBulkEditItems"
+                        @modal-close="onBulkEditModalClose"
+                    >
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_list_bulk_edit_grid_columns_name %}
+                        <template #column-firstName="{ item }">
+                            <router-link
+                                :to="{ name: 'sw.customer.detail', params: { id: item.id } }"
+                                target="_blank"
+                                rel="noreferrer noopener"
+                            >
+                                {{ item.lastName }}, {{ item.firstName }}
+                            </router-link>
+                        </template>
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_list_bulk_edit_grid_columns_group %}
+                        <template #column-group="{ item }">
+                            <sw-label
+                                v-if="item.requestedGroup"
+                                class="sw-customer-list__requested-group-label"
+                                variant="warning"
+                                appearance="pill"
+                            >
+                                {{ $tc('sw-customer.list.columnGroupRequested') }} {{ item.requestedGroup.translated.name }}
+                            </sw-label>
+                            <sw-label
+                                v-else
+                                size="default"
+                                appearance="pill"
+                            >
+                                {{ item.group.translated.name }}
+                            </sw-label>
+                        </template>
+                        {% endblock %}
+                    </sw-bulk-edit-modal>
+                </template>
+                {% endblock %}
+            </sw-entity-listing>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_customer_list_empty_state %}
+            <template v-if="!isLoading && !total">
+                <sw-empty-state
+                    v-if="filterCriteria.length || isValidTerm(term)"
+                    :title="$tc('sw-empty-state.messageNoResultTitle')"
+                >
+                    <template #icon>
+                        <img
+                            :src="'/administration/static/img/empty-states/customer-empty-state.svg' | asset"
+                            :alt="$tc('sw-empty-state.messageNoResultTitle')"
+                        >
+                    </template>
+
+                    <template #default>
+                        {{ $tc('sw-empty-state.messageNoResultSublineBefore') }}
+                        <router-link
+                            class="sw-empty-state__description-link"
+                            :to="{ name: 'sw.profile.index.searchPreferences' }"
+                        >
+                            {{ $tc('sw-empty-state.messageNoResultSublineLink') }}
+                        </router-link>
+                        {{ $tc('sw-empty-state.messageNoResultSublineAfter') }}
+                    </template>
+                </sw-empty-state>
+                <sw-empty-state
+                    v-else
+                    :title="$tc('sw-customer.list.messageEmpty')"
+                >
+                    <template #icon>
+                        <img
+                            :src="'/administration/static/img/empty-states/customer-empty-state.svg' | asset"
+                            :alt="$tc('sw-customer.list.messageEmpty')"
+                        >
+                    </template>
+                </sw-empty-state>
+            </template>
+            {% endblock %}
+        </div>
+        {% endblock %}
+    </template>
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_customer_list_sidebar %}
+    <template #sidebar>
+        <sw-sidebar class="sw-customer-list__sidebar">
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_customer_list_sidebar_refresh %}
+            <sw-sidebar-item
+                icon="regular-undo"
+                :title="$tc('sw-customer.list.titleSidebarItemRefresh')"
+                @click="onRefresh"
+            />
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_customer_list_sidebar_filter %}
+            <sw-sidebar-filter-panel
+                entity="customer"
+                :store-key="storeKey"
+                :filters="listFilters"
+                :defaults="defaultFilters"
+                :active-filter-number="activeFilterNumber"
+                @criteria-changed="updateCriteria"
+            />
+            {% endblock %}
+        </sw-sidebar>
+    </template>
+    {% endblock %}
+</sw-page>
+{% endblock %}

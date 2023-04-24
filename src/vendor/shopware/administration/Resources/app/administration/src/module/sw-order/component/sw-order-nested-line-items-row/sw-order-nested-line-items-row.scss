@@ -1,0 +1,51 @@
+@import "~scss/variables";
+
+.sw-order-nested-line-items-row {
+    &__content {
+        display: flex;
+    }
+
+    &__nesting-level {
+        border-left: 1px solid $color-gray-300;
+        display: inline-block;
+        height: 100%;
+        margin: 0 8px 0 12px;
+    }
+
+    &__label > div {
+        float: left;
+    }
+
+    &__label-content {
+        padding: 10px;
+    }
+
+    &__item {
+        flex-grow: 1;
+        padding: 10px;
+        height: 42px;
+        font-size: $font-size-default;
+
+        &:first-child {
+            padding: 0 0 0 20px;
+        }
+
+        &:last-child {
+            padding-right: 30px;
+        }
+    }
+
+    &__quantity {
+        width: 100px;
+        flex-grow: 0;
+        text-align: right;
+    }
+
+    &__unit-price,
+    &__tax,
+    &__total-price {
+        width: 120px;
+        flex-grow: 0;
+        text-align: right;
+    }
+}

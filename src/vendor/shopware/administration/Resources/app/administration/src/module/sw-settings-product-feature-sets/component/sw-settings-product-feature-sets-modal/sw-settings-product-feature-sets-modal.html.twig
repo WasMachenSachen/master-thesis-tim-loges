@@ -1,0 +1,220 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_settings_product_feature_sets_modal %}
+<sw-modal
+    :title="$tc('sw-settings-product-feature-sets.modal.labelTitleModal')"
+    class="sw-settings-product-feature-sets__modal"
+    @modal-close="$emit('modal-close')"
+>
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_settings_product_feature_sets_modal_first_page %}
+    <template v-if="showPageOne">
+        <sw-radio-field
+            v-model="selectedFeatureType"
+            :label="$tc('sw-settings-product-feature-sets.modal.labelTitlePageOne')"
+            block
+            class="sw-settings-product-feature-sets-modal__options"
+            identification="fieldType"
+            :options="settingOptions"
+            @change="onChangeOption"
+        />
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_settings_product_feature_sets_modal_custom_field_list %}
+    <template v-if="showCustomField">
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_product_feature_sets_modal_custom_field_list_toolbar %}
+        <div class="sw-product-feature-set-modal-custom-field-list__toolbar">
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_product_feature_sets_modal_custom_field_list_toolbar_search %}
+            <sw-simple-search-field
+                v-model="term"
+                size="small"
+                variant="form"
+                @search-term-change="onSearchCustomFields"
+            />
+            {% endblock %}
+
+        </div>
+        {% endblock %}
+
+        <sw-data-grid
+            ref="customFieldGrid"
+            :data-source="customFields"
+            :columns="customFieldColumns"
+            :show-selection="true"
+            :show-actions="false"
+            :is-loading="valuesLoading"
+            identifier="sw-product-feature-set-modal-custom-field-list"
+            @selection-change="setFeatureSelection"
+        >
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_product_feature_sets_modal_custom_field_list_column_name %}
+            <template #column-name="{ item }">
+                {{ readCustomFieldLabel(item) }}
+            </template>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_product_feature_sets_modal_custom_field_list_column_type %}
+            <template #column-type="{ item }">
+                {{ item.type }}
+            </template>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_product_feature_sets_modal_custom_field_list_pagination %}
+            <template #pagination>
+                <sw-pagination
+                    v-if="customFieldTotal > customFieldCriteria.limit"
+                    :total="customFieldTotal"
+                    :limit="customFieldCriteria.limit"
+                    :page="customFieldCriteria.page"
+                    :auto-hide="false"
+                    @page-change="paginateCustomFieldGrid"
+                />
+            </template>
+            {% endblock %}
+
+        </sw-data-grid>
+
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_settings_product_feature_sets_modal_property_list %}
+    <template v-if="showPropertyGroups">
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_product_feature_sets_modal_property_list_toolbar %}
+        <div class="sw-product-feature-set-modal-property-list__toolbar">
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_product_feature_sets_modal_property_list_toolbar_search %}
+            <sw-simple-search-field
+                v-model="term"
+                size="small"
+                variant="form"
+                @search-term-change="onSearchPropertyGroups"
+            />
+            {% endblock %}
+
+        </div>
+        {% endblock %}
+
+        <sw-data-grid
+            ref="propertyGroupGrid"
+            :data-source="propertyGroups"
+            :columns="propertyGroupColumns"
+            :show-selection="true"
+            :show-actions="false"
+            :is-loading="valuesLoading"
+            identifier="sw-product-feature-set-modal-property-list"
+            @selection-change="setFeatureSelection"
+        >
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_product_feature_sets_modal_property_list_column_property %}
+            <template #column-id="{ item }">
+                {{ item.name }}
+            </template>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_product_feature_sets_modal_property_list_pagination %}
+            <template #pagination>
+                <sw-pagination
+                    v-if="propertyGroupTotal > propertyGroupCriteria.limit"
+                    :total="propertyGroupTotal"
+                    :limit="propertyGroupCriteria.limit"
+                    :page="propertyGroupCriteria.page"
+                    :auto-hide="false"
+                    @page-change="paginatePropertyGroupGrid"
+                />
+            </template>
+            {% endblock %}
+
+        </sw-data-grid>
+
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_settings_product_feature_sets_modal_product_information_list %}
+    <template v-if="showProductInfo">
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_product_feature_sets_modal_product_information_list_toolbar %}{% endblock %}
+
+        <sw-data-grid
+            :data-source="productInfo"
+            :columns="productInformationColumns"
+            :show-selection="true"
+            :show-actions="false"
+            :is-loading="valuesLoading"
+            identifier="sw-product-feature-set-modal-product-information-list"
+            @selection-change="setFeatureSelection"
+        >
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_product_feature_sets_modal_product_informationlist_column_property %}
+            <template #column-id="{ item }">
+                {{ item.name }}
+            </template>
+            {% endblock %}
+
+        </sw-data-grid>
+
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_settings_product_feature_sets_modal_footer %}
+    <template #modal-footer>
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_product_feature_sets_modal_footer_cancel %}
+        <sw-button
+            size="small"
+            @click="$emit('modal-close')"
+        >
+            {{ $tc('sw-settings-product-feature-sets.modal.buttonCancel') }}
+        </sw-button>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_product_feature_sets_modal_footer_button_add %}
+        <sw-button
+            v-if="!showPageOne | referencePriceSelected"
+            variant="primary"
+            size="small"
+            :disabled="addButtonDisabled"
+            @click="onConfirm"
+        >
+            {{ $tc('sw-settings-product-feature-sets.modal.buttonAdd') }}
+        </sw-button>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_product_feature_sets_modal_footer_button_next %}
+        <sw-button
+            v-if="showNextButton"
+            variant="primary"
+            size="small"
+            :disabled="nextButtonDisabled"
+            @click="onClickNext"
+        >
+            {{ $tc('sw-settings-product-feature-sets.modal.buttonNext') }}
+        </sw-button>
+        {% endblock %}
+
+    </template>
+    {% endblock %}
+
+</sw-modal>
+{% endblock %}

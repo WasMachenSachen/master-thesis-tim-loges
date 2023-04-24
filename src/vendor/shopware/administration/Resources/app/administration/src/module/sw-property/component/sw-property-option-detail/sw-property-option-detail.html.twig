@@ -1,0 +1,93 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_property_option_detail %}
+<sw-modal
+    :title="currentOption.name ? currentOption.name : $tc('sw-property.detail.textOptionHeadline')"
+    @modal-close="onCancel"
+>
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_property_option_detail_name %}
+    <sw-text-field
+        v-model="currentOption.name"
+        validation="required"
+        :label="$tc('sw-property.detail.labelOptionName')"
+        :disabled="!allowEdit"
+        :placeholder="$tc('sw-property.detail.placeholderOptionName')"
+        :error="currentOptionNameError"
+        required
+    />
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_property_option_detail_position %}
+    <sw-number-field
+        v-model="currentOption.position"
+        pattern="[0-9]"
+        :step="1"
+        :disabled="!allowEdit"
+        :label="$tc('sw-property.detail.labelOptionPosition')"
+        :placeholder="$tc('sw-property.detail.placeholderOptionPosition')"
+    />
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_property_option_detail_color %}
+    <sw-colorpicker
+        v-model="currentOption.colorHexCode"
+        color-output="hex"
+        :disabled="!allowEdit"
+        :label="$tc('sw-property.detail.labelOptionColor')"
+        :z-index="1000"
+    />
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_property_option_detail_media %}
+    <sw-upload-listener
+        :upload-tag="currentOption.id"
+        auto-upload
+        @media-upload-finish="successfulUpload"
+    />
+    <sw-media-compact-upload-v2
+        default-folder="product"
+        :label="$tc('sw-property.detail.labelMediaUpload')"
+        :source="currentOption.mediaId"
+        :upload-tag="currentOption.id"
+        :disabled="!allowEdit"
+        @media-upload-remove-image="removeMedia"
+        @selection-change="setMedia"
+    />
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_property_option_detail_footer %}
+    <template #modal-footer>
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_property_option_detail_footer_cancel %}
+        <sw-button
+            size="small"
+            @click="onCancel"
+        >
+            {{ $tc('sw-property.detail.buttonCancel') }}
+        </sw-button>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_property_option_detail_footer_save %}
+        <sw-button
+            v-tooltip.bottom="{
+                message: $tc('sw-privileges.tooltip.warning'),
+                disabled: acl.can('property.editor'),
+                showOnDisabledElements: true
+            }"
+            variant="primary"
+            size="small"
+            :disabled="!allowEdit"
+            @click="onSave"
+        >
+            {{ $tc('sw-property.detail.buttonApply') }}
+        </sw-button>
+        {% endblock %}
+    </template>
+    {% endblock %}
+</sw-modal>
+{% endblock %}

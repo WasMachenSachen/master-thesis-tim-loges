@@ -1,0 +1,101 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_product_layout_assignment %}
+<div class="sw-product-layout-assignment">
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_product_layout_assignment_firgure %}
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+    <div
+        class="sw-product-layout-assignment__figure"
+        @click="openLayoutModal"
+    >
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_product_layout_assignment_firgure_content %}
+        <sw-cms-list-item
+            active
+            :disabled="!acl.can('product.editor')"
+            :page="cmsPage"
+        />
+        {% endblock %}
+    </div>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_product_layout_assignment_description %}
+    <div>
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_product_layout_assignment_heading %}
+        <div
+            class="sw-product-layout-assignment__heading"
+            :class="{ 'is--disabled': !cmsPage }"
+        >
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_product_layout_assignment_heading_title %}
+            <p class="sw-product-layout-assignment__title">
+                {{ cmsPage ? cmsPage.name : $tc('sw-product.layoutAssignment.title') }}
+            </p>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_product_layout_assignment_heading_subtitle %}
+            <span class="sw-product-layout-assignment__subtitle">
+                {{ $tc('sw-product.layoutAssignment.subtitle') }}
+            </span>
+            {% endblock %}
+        </div>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_product_layout_assignment_buttons %}
+        <div class="sw-product-layout-assignment__buttons">
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_product_layout_assignment_button_add %}
+            <sw-button
+                class="sw-product-layout-assignment__button"
+                size="small"
+                :disabled="!acl.can('product.editor')"
+                @click="openLayoutModal"
+            >
+                {{ cmsPage
+                    ? $tc('sw-product.layoutAssignment.textChangeLayout')
+                    : $tc('sw-product.layoutAssignment.textAssignLayout')
+                }}
+            </sw-button>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_product_layout_assignment_button_edit %}
+            <sw-button
+                class="sw-product-layout-assignment__button"
+                size="small"
+                :disabled="!acl.can('product.editor')"
+                @click="openInPageBuilder"
+            >
+                {{ cmsPage
+                    ? $tc('sw-product.layoutAssignment.textEditInDesigner')
+                    : $tc('sw-product.layoutAssignment.textCreateNewLayout')
+                }}
+            </sw-button>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_product_layout_assignment_button_delete %}
+            <sw-button
+                v-if="cmsPage"
+                class="sw-product-layout-assignment__button"
+                square
+                size="small"
+                :disabled="!acl.can('product.editor')"
+                @click="onLayoutReset"
+            >
+                <sw-icon
+                    name="regular-trash"
+                    small
+                />
+            </sw-button>
+            {% endblock %}
+        </div>
+        {% endblock %}
+    </div>
+    {% endblock %}
+</div>
+{% endblock %}

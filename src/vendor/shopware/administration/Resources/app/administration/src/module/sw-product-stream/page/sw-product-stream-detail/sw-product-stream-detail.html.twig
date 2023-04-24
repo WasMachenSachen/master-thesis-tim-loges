@@ -1,0 +1,226 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_product_stream_detail %}
+<sw-page class="sw-product-stream-detail">
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_product_stream_detail_header %}
+    <template slot="smart-bar-header">
+        <h2 v-if="productStream">
+            {{ productStream.name }}
+        </h2>
+        <h2
+            v-else
+            class="sw-product-stream-detail__empty-title"
+        >
+            {{ placeholder(productStream, 'name', $tc('sw-product-stream.detail.textHeadline')) }}
+        </h2>
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_product_stream_detail_actions %}
+    <template slot="smart-bar-actions">
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_product_stream_detail_actions_abort %}
+        <sw-button
+            v-tooltip.bottom="tooltipCancel"
+            :disabled="isLoading"
+            @click="onCancel"
+        >
+            {{ $tc('sw-product-stream.detail.buttonCancel') }}
+        </sw-button>
+        {% endblock %}
+
+        <sw-button-group
+            v-tooltip.bottom="{
+                message: $tc('sw-privileges.tooltip.warning'),
+                disabled: acl.can('product_stream.editor'),
+                showOnDisabledElements: true
+            }"
+            class="sw-product-stream-detail__save-button-group"
+            :split-button="true"
+        >
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_product_stream_detail_actions_save %}
+            <sw-button-process
+                v-model="isSaveSuccessful"
+                v-tooltip.bottom="tooltipSave"
+                class="sw-product-stream-detail__save-action"
+                :is-loading="isLoading"
+                :disabled="!acl.can('product_stream.editor')"
+                variant="primary"
+                @click.prevent="onSave"
+            >
+                {{ $tc('sw-product-stream.detail.buttonSave') }}
+            </sw-button-process>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_product_stream_detail_actions_save_context_menu %}
+            <sw-context-button>
+                <template slot="button">
+                    <sw-button
+                        class="sw-product-stream-detail__button-context-menu"
+                        square
+                        variant="primary"
+                        :disabled="isLoading || !acl.can('product_stream.editor')"
+                    >
+                        <sw-icon
+                            name="regular-chevron-down-xs"
+                            size="16"
+                        />
+                    </sw-button>
+                </template>
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_stream_detail_actions_save_context_menu_actions %}
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_stream_detail_actions_duplicate %}
+                <sw-context-menu-item
+                    class="sw-product-stream-detail__save-duplicate-action"
+                    :disabled="!acl.can('product_stream.creator') || !acl.can('product_stream.editor')"
+                    @click="onDuplicate"
+                >
+                    {{ $tc('sw-product.detail.buttonSaveDuplicate') }}
+                </sw-context-menu-item>
+                {% endblock %}
+                {% endblock %}
+            </sw-context-button>
+            {% endblock %}
+        </sw-button-group>
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_product_stream_detail_language_switch %}
+    <template #language-switch>
+        <sw-language-switch
+            :save-changes-function="saveOnLanguageChange"
+            :abort-change-function="abortOnLanguageChange"
+            :disabled="!productStreamId"
+            @on-change="onChangeLanguage"
+        />
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_product_stream_detail_content %}
+    <template #content>
+        <sw-card-view>
+            <template v-if="isLoading || customFieldsLoading">
+                <sw-skeleton variant="detail-bold" />
+                <sw-skeleton />
+            </template>
+
+            <template v-else>
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_stream_detail_content_language_info %}
+                <sw-language-info
+                    :entity-description="placeholder(productStream, 'name', $tc('sw-product-stream.detail.textHeadline'))"
+                />
+                {% endblock %}
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_stream_detail_basic_info %}
+                <sw-card
+                    position-identifier="sw-product-stream-detail-basic-info"
+                    :large="true"
+                    :title="$tc('sw-product-stream.detail.titleCard')"
+                >
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_product_basic_form_name_field %}
+                    <sw-text-field
+                        v-if="productStream"
+                        v-model="productStream.name"
+                        v-tooltip.bottom="getNoPermissionsTooltip('product_stream.editor')"
+                        :label="$tc('sw-product-stream.detail.labelName')"
+                        :validation="nameRequired"
+                        :required="isSystemLanguage"
+                        :placeholder="placeholder(productStream, 'name', $tc('sw-product-stream.detail.placeholderName'))"
+                        :error="productStreamNameError"
+                        :disabled="!acl.can('product_stream.editor')"
+                    />
+                    {% endblock %}
+
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_product_basic_form_description_field %}
+                    <sw-textarea-field
+                        v-if="productStream"
+                        v-model="productStream.description"
+                        v-tooltip.bottom="getNoPermissionsTooltip('product_stream.editor')"
+                        :label="$tc('sw-product-stream.detail.labelDescription')"
+                        :placeholder="placeholder(productStream, 'description', $tc('sw-product-stream.detail.placeholderDescription'))"
+                        :disabled="!acl.can('product_stream.editor')"
+                    />
+                    {% endblock %}
+                </sw-card>
+                {% endblock %}
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_stream_detail_filter %}
+                <sw-card
+                    :large="true"
+                    position-identifier="sw-product-stream-detail-filter"
+                    class="sw-product-stream-detail__condition_container"
+                    :class="{ 'is--disabled': !acl.can('product_stream.editor') }"
+                    :title="$tc('sw-product-stream.detail.titleFilter')"
+                >
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_product_stream_detail_filter_tree %}
+                    <sw-condition-tree
+                        v-if="productStream"
+                        :initial-conditions="productStreamFilters"
+                        :condition-repository="productStreamFiltersRepository"
+                        :condition-data-provider-service="productStreamConditionService"
+                        child-association-field="queries"
+                        association-field="productStreamId"
+                        :association-value="productStream.id"
+                        :root-condition="null"
+                        :disabled="!acl.can('product_stream.editor')"
+                        @conditions-changed="updateFilterTree"
+                    />
+                    {% endblock %}
+
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_product_stream_detail_filter_preview_button %}
+                    <sw-button
+                        class="sw-product-stream-detail__open_modal_preview"
+                        @click.prevent="openModalPreview"
+                    >
+                        {{ $tc('sw-product-stream.detail.buttonOpenPreview') }}
+                    </sw-button>
+                    {% endblock %}
+                </sw-card>
+                {% endblock %}
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_prouct_stream_detail_preview_modal %}
+                <sw-product-stream-modal-preview
+                    v-if="showModalPreview"
+                    ref="modalPreview"
+                    :filters="productStreamFiltersTree"
+                    @modal-close="closeModalPreview"
+                />
+                {% endblock %}
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_prouct_stream_detail_custom_field_sets %}
+                <sw-card
+                    v-if="showCustomFields"
+                    position-identifier="sw-product-stream-detail-custom-field-sets"
+                    :large="true"
+                    :title="$tc('sw-settings-custom-field.general.mainMenuItemGeneral')"
+                >
+                    <sw-custom-field-set-renderer
+                        :entity="productStream"
+                        :disabled="!acl.can('product_stream.editor')"
+                        :sets="customFieldSets"
+                    />
+                </sw-card>
+                {% endblock %}
+            </template>
+        </sw-card-view>
+    </template>
+    {% endblock %}
+</sw-page>
+{% endblock %}

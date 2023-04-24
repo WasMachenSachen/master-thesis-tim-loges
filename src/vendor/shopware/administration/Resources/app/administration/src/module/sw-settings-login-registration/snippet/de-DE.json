@@ -1,0 +1,11 @@
+{
+  "sw-settings-login-registration": {
+    "general": {
+      "mainMenuItemGeneral": "Login / Registrierung",
+      "description": "Hier können Einstellungen für den Login und die Registrierung vorgenommen werden.",
+      "textHeadline": "Login / Registrierung",
+      "buttonSave": "Speichern",
+      "messageSaveSuccess": "Konfiguration gespeichert."
+    }
+  }
+}

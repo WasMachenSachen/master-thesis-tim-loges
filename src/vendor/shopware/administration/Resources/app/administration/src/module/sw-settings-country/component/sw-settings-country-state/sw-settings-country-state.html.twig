@@ -1,0 +1,143 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_settings_country_state_list_card %}
+<sw-card
+    v-if="!isLoading"
+    position-identifier="sw-settings-country-state"
+>
+    <template #toolbar>
+        <sw-container
+            columns="1fr 32px minmax(100px, 200px)"
+            gap="0 10px"
+        >
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_attribute_list_toolbar_searchfield %}
+            <sw-simple-search-field
+                v-model="term"
+                size="small"
+                variant="form"
+                @search-term-change="onSearchCountryState"
+            />
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_country_state_list_toolbar_delete %}
+            <sw-button
+                v-tooltip.bottom="{
+                    message: $tc('sw-privileges.tooltip.warning'),
+                    disabled: acl.can('country.editor'),
+                    showOnDisabledElements: true
+                }"
+                square
+                size="small"
+                class="sw-settings-country-state-list__delete-button"
+                :disabled="deleteButtonDisabled || !acl.can('country.editor')"
+                @click="onDeleteCountryStates"
+            >
+                <sw-icon
+                    name="regular-trash"
+                    small
+                />
+            </sw-button>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_country_state_list_toolbar_add %}
+            <sw-button
+                v-tooltip.bottom="{
+                    message: $tc('sw-privileges.tooltip.warning'),
+                    disabled: acl.can('country.editor'),
+                    showOnDisabledElements: true
+                }"
+                class="sw-settings-country-state__add-country-state-button"
+                size="x-small"
+                variant="primary"
+                :disabled="!acl.can('country.editor')"
+                @click="onAddCountryState"
+            >
+                {{ $tc('sw-settings-country.detail.buttonAddCountryState') }}
+            </sw-button>
+            {% endblock %}
+
+        </sw-container>
+    </template>
+
+    <template #grid>
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_country_state_list_listing %}
+        <sw-one-to-many-grid
+            ref="countryStateGrid"
+            class="sw-settings-country-state-list__content"
+            :is-loading="countryStateLoading"
+            :collection="country.states"
+            :full-page="false"
+            :local-mode="country.isNew()"
+            :columns="stateColumns"
+            :allow-delete="acl.can('country.editor')"
+            :tooltip-delete="{
+                message: $tc('sw-privileges.tooltip.warning'),
+                disabled: acl.can('country.editor'),
+                showOnDisabledElements: true
+            }"
+            @selection-change="countryStateSelectionChanged"
+            @load-finish="checkEmptyState"
+        >
+
+            <template #column-name="{ item }">
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_settings_country_state_list_listing_column_name %}
+                <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+                <a
+                    class="sw-settings-country-state__link"
+                    @click="onClickCountryState(item)"
+                >
+                    {{ getCountryStateName(item) }}
+                </a>
+                {% endblock %}
+
+            </template>
+
+            <template #more-actions="{ item }">
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_settings_country_state_list_listing_action_edit %}
+                <sw-context-menu-item
+                    v-tooltip.top="{
+                        message: $tc('sw-privileges.tooltip.warning'),
+                        disabled: acl.can('country.editor'),
+                        showOnDisabledElements: true
+                    }"
+                    class="sw-settings-country-state__edit-country-state-action"
+                    :disabled="!acl.can('country.editor')"
+                    @click="onClickCountryState(item)"
+                >
+                    {{ $tc('sw-settings-country.detail.editAction') }}
+                </sw-context-menu-item>
+                {% endblock %}
+            </template>
+        </sw-one-to-many-grid>
+        {% endblock %}
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_country_state_list_empty %}
+        <sw-empty-state
+            v-if="showEmptyState"
+            :absolute="false"
+            :title="$tc('sw-country-state-detail.emptyTitle')"
+            :subline="$tc('sw-country-state-detail.emptySubline')"
+            auto-height
+        />
+        {% endblock %}
+    </template>
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_settings_country_state_detail %}
+    <sw-country-state-detail
+        v-if="currentCountryState"
+        :country-state="currentCountryState"
+        @attribute-edit-save="onSaveCountryState"
+        @attribute-edit-cancel="onCancelCountryState"
+    />
+    {% endblock %}
+</sw-card>
+{% endblock %}
+

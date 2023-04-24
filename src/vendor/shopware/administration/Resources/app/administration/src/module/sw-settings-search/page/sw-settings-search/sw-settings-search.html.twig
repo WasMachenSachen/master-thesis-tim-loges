@@ -1,0 +1,120 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_settings_search_index %}
+<sw-page class="sw-settings-search">
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_settings_search_smart_bar_header %}
+    <template #smart-bar-header>
+        <h2>
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_search_smart_bar_header_title_text %}
+            {{ $tc('sw-settings.index.title') }}
+            <sw-icon
+                name="regular-chevron-right-xs"
+                small
+            />
+            {{ $tc('sw-settings-search.general.mainMenuItemGeneral') }}
+            {% endblock %}
+        </h2>
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_settings_search_language_switch %}
+    <template #language-switch>
+        <sw-language-switch @on-change="onChangeLanguage" />
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_settings_search_smart_bar_actions %}
+    <template #smart-bar-actions>
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_search_smart_bar_actions_save %}
+        <sw-button-process
+            v-tooltip.bottom="tooltipSave"
+            class="sw-settings-search__button-save"
+            variant="primary"
+            :disabled="!allowSave"
+            :is-loading="isLoading"
+            :process-success="isSaveSuccessful"
+            @process-finish="saveFinish"
+            @click.prevent="onSaveSearchSettings"
+        >
+            {{ $tc('global.default.save') }}
+        </sw-button-process>
+        {% endblock %}
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_settings_search_content %}
+    <template #content>
+        <sw-card-view>
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_search_tabs_header %}
+            <sw-tabs position-identifier="sw-settings-search-header">
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_setting_search_tabs_general %}
+                <sw-tabs-item
+                    v-bind="$props"
+                    class="sw-settings-search__general-tab"
+                    :route="{ name: 'sw.settings.search.index.general' }"
+                    @click="onTabChange"
+                >
+                    {{ $tc('sw-settings-search.page.generalTab') }}
+                </sw-tabs-item>
+                {% endblock %}
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_setting_search_tabs_live_search %}
+                <sw-tabs-item
+                    v-bind="$props"
+                    class="sw-settings-search__live-search-tab"
+                    :route="{ name: 'sw.settings.search.index.liveSearch' }"
+                >
+                    {{ $tc('sw-settings-search.page.liveSearchTab') }}
+                </sw-tabs-item>
+                {% endblock %}
+            </sw-tabs>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_search_tabs_content %}
+            <template v-if="isLoading">
+                <sw-skeleton />
+                <sw-skeleton />
+            </template>
+
+            {# v-show is used here as underlying components influence the loading state and v-if would destroy this behaviour #}
+            <router-view
+                v-show="!isLoading"
+                :is-loading="isLoading"
+                :product-search-configs="productSearchConfigs"
+                :current-sales-channel-id="currentSalesChannelId"
+                :search-terms="searchTerms"
+                :search-results="searchResults"
+                @edit-change="onEditChanged"
+                @sales-channel-change="onSalesChannelChanged"
+                @live-search-results-change="onLiveSearchResultsChanged"
+                @excluded-search-terms-load="getProductSearchConfigs"
+            />
+            {% endblock %}
+        </sw-card-view>
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_search_discard_model %}
+        <sw-confirm-modal
+            v-if="isDisplayingLeavePageWarning"
+            class="sw_settings_search_leave_modal"
+            type="yesno"
+            :text="$tc('sw-settings-search.textLeaveConfirm')"
+            @confirm="onConfirmLeave"
+            @close="onCloseLeaveModal"
+            @cancel="onCancelLeaveModal"
+        />
+        {% endblock %}
+
+    </template>
+    {% endblock %}
+</sw-page>
+{% endblock %}

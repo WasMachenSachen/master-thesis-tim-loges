@@ -1,0 +1,11 @@
+.product-basic-form {
+    position: relative;
+
+    .product-basic-form__switches {
+        display: flex;
+
+        .sw-field {
+            margin-right: 20px;
+        }
+    }
+}

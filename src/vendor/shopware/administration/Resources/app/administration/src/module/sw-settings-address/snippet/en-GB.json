@@ -1,0 +1,11 @@
+{
+  "sw-settings-address": {
+    "general": {
+      "mainMenuItemGeneral": "Address settings",
+      "textHeadline": "Address settings",
+      "description": "Manage address settings here.",
+      "buttonSave": "Save",
+      "messageSaveSuccess": "The configuration has been saved."
+    }
+  }
+}

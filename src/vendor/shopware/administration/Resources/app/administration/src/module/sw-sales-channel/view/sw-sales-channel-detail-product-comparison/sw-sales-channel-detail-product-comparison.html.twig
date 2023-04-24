@@ -1,0 +1,126 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_sales_channel_detail_base %}
+<div class="sw-sales-channel-detail-product-comparison">
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_sales_channel_detail_product_comparison %}
+    <sw-card
+        key="edit"
+        position-identifier="sw-sales-channel-detail-product-comparison"
+        :is-loading="isLoading"
+        :title="$tc('sw-sales-channel.detail.titleProductComparisonTemplate')"
+    >
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_sales_channel_detail_product_comparison_header %}
+        <sw-container>
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_sales_channel_detail_product_comparison_input_header %}
+            <sw-code-editor
+                v-model="productExport.headerTemplate"
+                :label="$tc('sw-sales-channel.detail.productComparison.inputHeaderLabel')"
+                :completer-function="outerCompleterFunctionHeader"
+                :editor-config="editorConfig"
+                completion-mode="entity"
+                mode="twig"
+                :soft-wraps="true"
+                :set-focus="false"
+                :disabled="!acl.can('sales_channel.editor')"
+                @input="resetValid"
+                @blur="resetValid"
+            />
+            {% endblock %}
+        </sw-container>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_sales_channel_detail_product_comparison_body %}
+        <sw-container>
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_sales_channel_detail_product_comparison_input_body %}
+            <sw-code-editor
+                v-model="productExport.bodyTemplate"
+                :label="$tc('sw-sales-channel.detail.productComparison.inputBodyLabel')"
+                :completer-function="outerCompleterFunctionBody"
+                :editor-config="editorConfig"
+                completion-mode="entity"
+                mode="twig"
+                :soft-wraps="true"
+                :set-focus="false"
+                :disabled="!acl.can('sales_channel.editor')"
+                @input="resetValid"
+                @blur="resetValid"
+            />
+            {% endblock %}
+        </sw-container>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_sales_channel_detail_product_comparison_footer %}
+        <sw-container>
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_sales_channel_detail_product_comparison_input_footer %}
+            <sw-code-editor
+                v-model="productExport.footerTemplate"
+                :label="$tc('sw-sales-channel.detail.productComparison.inputFooterLabel')"
+                :completer-function="outerCompleterFunctionFooter"
+                :editor-config="editorConfig"
+                completion-mode="entity"
+                mode="twig"
+                :soft-wraps="true"
+                :set-focus="false"
+                :disabled="!acl.can('sales_channel.editor')"
+                @input="resetValid"
+                @blur="resetValid"
+            />
+            {% endblock %}
+        </sw-container>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_sales_channel_detail_product_comparison_actions %}
+        <div class="sw-sales-channel-detail-product-comparison__button-group">
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_sales_channel_detail_product_comparison_actions_test_button %}
+            <sw-button-process
+                size="small"
+                variant="ghost"
+                class="sw-sales-channel-detail-product-comparison__button sw-sales-channel-detail-product-comparison__test-action"
+                :is-loading="isLoadingValidate"
+                :disabled="isLoadingValidate || (!productExport.headerTemplate && !productExport.bodyTemplate && !productExport.footerTemplate)"
+                :process-success="isValidateSuccessful"
+                @click="validateTemplate"
+            >
+                {{ $tc('sw-sales-channel.detail.productComparison.buttonTestLabel') }}
+            </sw-button-process>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_sales_channel_detail_product_comparison_actions_preview_button %}
+            <sw-button-process
+                size="small"
+                variant="ghost"
+                class="sw-sales-channel-detail-product-comparison__button sw-sales-channel-detail-product-comparison__preview-action"
+                :is-loading="isLoadingPreview"
+                :disabled="isLoadingPreview || (!productExport.headerTemplate && !productExport.bodyTemplate && !productExport.footerTemplate)"
+                :process-success="isPreviewSuccessful"
+                @click="preview"
+            >
+                {{ $tc('sw-sales-channel.detail.productComparison.buttonPreviewLabel') }}
+            </sw-button-process>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_sales_channel_detail_product_comparison_actions_preview_component %}
+            <sw-sales-channel-detail-product-comparison-preview
+                :content="previewContent"
+                :errors="previewErrors"
+                @close="onPreviewClose"
+            />
+            {% endblock %}
+        </div>
+        {% endblock %}
+    </sw-card>
+    {% endblock %}
+</div>
+{% endblock %}

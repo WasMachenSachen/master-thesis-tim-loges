@@ -1,0 +1,146 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_settings_listing_option_criteria_card %}
+<sw-card
+    class="sw-settings-listing-option-criteria-grid__criteria-card"
+    position-identifier="sw-settings-listing-option-criteria-grid"
+    :title="$tc('sw-settings-listing.base.criteria.title')"
+>
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_settings_listing_option_criteria_card_toolbar %}
+    <template #toolbar>
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_listing_option_criteria_card_toolbar_select %}
+        <sw-single-select
+            :value="selectedCriteria"
+            :options="criteriaOptions"
+            :placeholder="$tc('sw-settings-listing.base.criteria.selectPlaceholder')"
+            value-property="value"
+            label-property="label"
+            show-clearable-button
+            @change="onAddCriteria"
+        />
+        {% endblock %}
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_settings_listing_option_criteria_card_grid %}
+    <sw-data-grid
+        v-if="productSortingEntity && productSortingEntity.fields.length > 0"
+        ref="dataGrid"
+        :columns="productSortingEntityColumns"
+        :data-source="sortedProductSortingFields"
+        :show-actions="true"
+        :allow-inline-edit="true"
+        :compact-mode="false"
+        :show-selection="false"
+        plain-appearance
+        item-identifier-property="field"
+        @inline-edit-save="onSaveInlineEdit"
+        @inline-edit-cancel="onCancelInlineEdit"
+    >
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_listing_option_criteria_card_grid_column_field %}
+        <template #column-field="{item, isInlineEdit}">
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_listing_option_criteria_card_grid_column_field_select %}
+            <sw-entity-single-select
+                v-if="item.field === 'customField' || (isItemACustomField(item.field) && isInlineEdit)"
+                ref="customFieldSelection"
+                v-model="item.name"
+                :placeholder="$tc('global.sw-single-select.valuePlaceholder')"
+                :criteria="customFieldCriteriaSingleSelect(item)"
+                :label-callback="getCustomFieldName"
+                entity="custom_field"
+                show-clearable-button
+                @change="changeCustomField"
+            />
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_listing_option_criteria_card_grid_column_field_custom_field %}
+            <span v-else-if="isItemACustomField(item.field)">
+                {{ getCustomFieldLabelByCriteriaName(item.field) }}
+            </span>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_listing_option_criteria_card_grid_column_field_custom_criteria %}
+            <span v-else>
+                {{ getCriteriaSnippetByFieldName(item.field) }}
+            </span>
+            {% endblock %}
+        </template>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_listing_option_criteria_card_grid_column_order %}
+        <template #column-order="{item, isInlineEdit}">
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_listing_option_criteria_card_grid_column_order_text %}
+            <div v-if="!isInlineEdit">
+                {{ getOrderSnippet(item.order) }}
+            </div>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_listing_option_criteria_card_grid_column_order_select %}
+            <sw-single-select
+                v-else
+                v-model="item.order"
+                :options="orderOptions"
+                value-property="value"
+                label-property="label"
+                show-clearable-button
+                :placeholder="$tc('global.sw-single-select.valuePlaceholder')"
+            />
+            {% endblock %}
+        </template>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_listing_option_criteria_card_grid_column_actions %}
+        <template #actions="{item}">
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_settings_listing_option_criteria_card_grid_column_actions_delete %}
+            <sw-context-menu-item
+                variant="danger"
+                @click="onRemoveCriteria(item)"
+            >
+                {{ $tc('global.default.delete') }}
+            </sw-context-menu-item>
+            {% endblock %}
+        </template>
+        {% endblock %}
+    </sw-data-grid>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_settings_listing_option_criteria_card_empty_state %}
+    <sw-empty-state
+        v-else
+        class="sw-settings-listing-option-criteria-grid__criteria-empty-state"
+        title=""
+        :subline="$tc('sw-settings-listing.base.criteria.emptyStateSubline')"
+    >
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_settings_listing_option_criteria_card_empty_state_icon %}
+        <template #icon>
+            <img
+                :src="'administration/static/img/empty-states/settings-empty-state.svg' | asset"
+                alt=""
+            >
+        </template>
+        {% endblock %}
+
+    </sw-empty-state>
+    {% endblock %}
+</sw-card>
+{% endblock %}

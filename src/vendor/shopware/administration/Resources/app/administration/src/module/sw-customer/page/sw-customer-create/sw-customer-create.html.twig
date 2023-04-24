@@ -1,0 +1,72 @@
+{%  block sw_customer_create %}
+<sw-page class="sw-customer-create">
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_customer_create_header %}
+    <template #smart-bar-header>
+        <h2>{{ customer | salutation($tc('sw-customer.general.newCustomer')) }}</h2>
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_customer_create_language_switch %}
+    <template #language-switch>
+        <sw-language-switch
+            v-tooltip="{ message: $tc('sw-customer.general.tooltipLanguageSwitch') }"
+            disabled
+        />
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_customer_create_actions %}
+    <template #smart-bar-actions>
+        <sw-button-process
+            class="sw-customer-create__save-action"
+            :is-loading="isLoading"
+            :disabled="isLoading"
+            :process-success="isSaveSuccessful"
+            variant="primary"
+            @process-finish="saveFinish"
+            @click.prevent="onSave"
+        >
+
+            {{ $tc('sw-customer.detail.buttonSave') }}
+        </sw-button-process>
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_customer_create_content %}
+    <template #content>
+        <sw-card-view>
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_customer_create_base_form %}
+            <sw-card
+                :title="$tc('sw-customer.detailBase.labelAccountCard')"
+                position-identifier="sw-customer-create-base-form"
+            >
+                <sw-customer-base-form
+                    :is-loading="isLoading"
+                    :customer="customer"
+                    @sales-channel-change="onChangeSalesChannel"
+                />
+            </sw-card>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_customer_create_adress_form %}
+            <sw-card
+                :title="$tc('sw-customer.detailBase.labelAddressesCard')"
+                position-identifier="sw-customer-create-address-form"
+            >
+                <sw-customer-address-form
+                    v-bind="{ customer, address }"
+                />
+            </sw-card>
+            {% endblock %}
+        </sw-card-view>
+    </template>
+    {% endblock %}
+</sw-page>
+{% endblock %}

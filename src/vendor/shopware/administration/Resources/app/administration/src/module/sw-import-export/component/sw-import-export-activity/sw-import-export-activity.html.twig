@@ -1,0 +1,209 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_import_export_activity %}
+<div class="sw-import-export-activity">
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_import_export_activity_listing %}
+    <sw-entity-listing
+        v-if="showGrid"
+        :repository="logRepository"
+        :items="logs"
+        :columns="exportActivityColumns"
+        sort-by="createdAt"
+        sort-direction="DESC"
+        :show-selection="false"
+        :allow-column-edit="false"
+        :full-page="true"
+    >
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_import_export_activity_listing_size %}
+        <template #column-file.size="{ item }">
+            {{ calculateFileSize(item.file.size) }}
+        </template>
+        {% endblock %}
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_import_export_activity_listing_records %}
+        <template #column-records="{ item }">
+            {{ item.records }}
+        </template>
+        {% endblock %}
+        <template #column-label-invalidRecords="{ column }">
+            {{ $te(column.label) ? $tc(column.label) : column.label }}
+            <sw-help-text
+                class="sw-import-export-activity__invalid-records-help-text"
+                :text="$tc('sw-import-export.activity.invalidHelpText')"
+            />
+        </template>
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_import_export_activity_listing_invalid_records %}
+        <template #column-invalidRecords="{ item }">
+            <template v-if="item.invalidRecordsLog">
+                {{ item.invalidRecordsLog.records }}
+            </template>
+            <template v-else>
+                0
+            </template>
+        </template>
+        {% endblock %}
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_import_export_activity_listing_createdAt %}
+        <template #column-createdAt="{ item }">
+            <sw-label
+                v-if="item.activity === 'dryrun'"
+                size="small"
+                appearance="pill"
+            >
+                {{ $tc('sw-import-export.activity.dryrun') }}
+            </sw-label>
+            <a
+                href="#"
+                @click.prevent="onShowLog(item)"
+            >
+                {{ item.createdAt | date({hour: '2-digit', minute: '2-digit'}) }}
+            </a>
+        </template>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_import_export_activity_listing_state %}
+        <template #column-state="{ item }">
+            <sw-color-badge
+                v-if="item.state === 'failed'"
+                variant="error"
+                rounded
+            />
+            <sw-color-badge
+                v-else-if="item.state === 'succeeded'"
+                variant="success"
+                rounded
+            />
+            <sw-color-badge
+                v-else
+                rounded
+            />
+            <span :class="getStateClass(item.state)">{{ getStateLabel(item.state) }}</span>
+        </template>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_import_export_activity_listing_actions %}
+        <template #actions="{ item }">
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_import_export_activity_listing_actions_show_results %}
+            <sw-context-menu-item
+                v-if="item.result && Object.keys(item.result).length"
+                class="sw-import-export-activity__results-action"
+                @click="onShowResult(item)"
+            >
+                {{ $tc('sw-import-export.activity.contextMenu.showResults') }}
+            </sw-context-menu-item>
+            {% endblock %}
+            {# @deprecated tag:v6.5.0 - will be removed, use "sw_import_export_activity_listing_actions_show_log_info" instead #}
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_import_export_activity_listing_actions_show_log %}{% endblock %}
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_import_export_activity_listing_actions_show_log_info %}
+            <sw-context-menu-item
+                v-if="type === 'export'"
+                class="sw-import-export-activity__log-info-action"
+                @click="onShowLog(item)"
+            >
+                {{ $tc('sw-import-export.activity.contextMenu.showLogInfo') }}
+            </sw-context-menu-item>
+            {% endblock %}
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_import_export_activity_listing_actions_download_file %}
+            <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+            <a
+                class="sw-import-export-activity__download-action"
+                @click="openProcessFileDownload(item)"
+            >
+                <sw-context-menu-item :disabled="type === 'export' && item.state !== 'succeeded'">
+                    {{ downloadFileText }}
+                </sw-context-menu-item>
+            </a>
+            {% endblock %}
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_import_export_activity_listing_actions_open_profile %}
+            <sw-context-menu-item @click="onOpenProfile(item.profileId)">
+                {{ $tc('sw-import-export.activity.contextMenu.showProfile') }}
+            </sw-context-menu-item>
+            {% endblock %}
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_import_export_activity_listing_actions_abort_process %}
+            <sw-context-menu-item
+                v-if="item.state === 'progress'"
+                class="sw-import-export-activity__abort-process-action"
+                variant="danger"
+                @click="onAbortProcess(item)"
+            >
+                {{ $tc('sw-import-export.activity.contextMenu.abortProcess') }}
+            </sw-context-menu-item>
+            {% endblock %}
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_import_export_activity_listing_actions_download_invalid %}
+            <template v-if="item.invalidRecordsLog">
+                <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+                <a
+                    class="sw-import-export-activity__download-action"
+                    @click="openProcessFileDownload(item.invalidRecordsLog)"
+                >
+                    <sw-context-menu-item>
+                        {{ $tc('sw-import-export.activity.contextMenu.downloadInvalidFile') }}
+                    </sw-context-menu-item>
+                </a>
+            </template>
+            {% endblock %}
+        </template>
+        {% endblock %}
+    </sw-entity-listing>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_import_export_activity_spinner %}
+    <sw-loader v-else-if="showSpinner" />
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_import_export_activity_empty_state %}
+    <sw-empty-state
+        v-if="showEmptyState"
+        :title="emptyStateTitle"
+        :subline="emptyStateSubLine"
+        :absolute="false"
+        icon="regular-database"
+    />
+    {% endblock %}
+
+    {# @deprecated tag:v6.5.0 - block will removed #}
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_import_export_activity_detail_modal %}{% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_import_export_activity_log_info_modal %}
+    <sw-import-export-activity-log-info-modal
+        v-if="showDetailModal"
+        :log-entity="selectedLog"
+        @log-close="closeSelectedLog"
+    />
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_import_export_activity_result_modal %}
+    <sw-import-export-activity-result-modal
+        v-if="showResultModal"
+        :log-entity="selectedLog"
+        :result="selectedResult"
+        @result-close="closeSelectedResult"
+    />
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_import_export_activity_modal %}
+    <sw-import-export-edit-profile-modal
+        :profile="selectedProfile"
+        @profile-save="saveSelectedProfile"
+        @profile-close="closeSelectedProfile"
+    />
+    {% endblock %}
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_product_variants_configurator_prices %}
+<div class="sw-product-variants-configurator-prices">
+    <sw-alert
+        class="sw-product-variants-configurator-prices__alert"
+        variant="info"
+    >
+        {{ $tc('sw-product.variations.configuratorModal.surchargeNotice') }}
+    </sw-alert>
+    <div class="sw-product-variants-configurator-prices__table">
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_product_variants_configurator_prices_groups %}
+        <div class="sw-product-variants-configurator-prices__groups">
+            <ul>
+                <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+                <li
+                    v-for="group in selectedGroups"
+                    :key="group.id"
+                    class="sw-product-variants-configurator-prices__groupElement"
+                    :class="{'is--selected': activeGroup.id == group.id}"
+                    @click="activeGroup = group"
+                >
+                    <sw-icon
+                        name="multicolor-folder-breadcrumbs"
+                        size="16px"
+                        multicolor
+                    />
+                    {{ group.translated.name }}
+                </li>
+            </ul>
+        </div>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_product_variants_configurator_prices_prices %}
+        <div class="sw-product-variants-configurator-prices__prices">
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_product_variants_configurator_prices_search %}
+            <div class="sw-product-variants-configurator-prices__search">
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_variants_configurator_prices_search_field %}
+                <sw-simple-search-field
+                    v-model="term"
+                    size="small"
+                    variant="form"
+                    :placeholder="$tc('sw-product.variations.configuratorModal.searchPlaceholder')"
+                />
+                {% endblock %}
+            </div>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_product_variants_configurator_prices_grid_wrapper %}
+            <div class="sw-product-variants-configurator-prices__grid-wrapper">
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_product_variants_configurator_prices_data_grid %}
+                <sw-data-grid
+                    v-if="optionsForGroup.length"
+                    :data-source="optionsForGroup"
+                    :show-selection="false"
+                    :columns="optionColumns"
+                    show-settings
+                    full-page
+                >
+
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_product_variants_configurator_prices_column_name %}
+                    <template
+                        slot="column-name"
+                        slot-scope="{ item, isInlineEdit, compact }"
+                    >
+                        {{ item.option.translated.name }}
+                    </template>
+                    {% endblock %}
+
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_product_variants_configurator_prices_column_currency %}
+                    <template
+                        v-for="currency in currenciesList"
+                        :slot="`column-currency.${currency.id}`"
+                        slot-scope="{ item, isInlineEdit, compact }"
+                    >
+
+                        <sw-product-variants-price-field
+                            :key="currency.id"
+                            :price="getCurrencyOfOption(item, currency.id)"
+                            :tax-rate="product.taxId"
+                            :currency="currency"
+                            compact
+                        />
+                    </template>
+                    {% endblock %}
+
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_product_variants_configurator_prices_actions %}
+                    <template
+                        slot="actions"
+                        slot-scope="{ item }"
+                    >
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_product_variants_configurator_prices_actions_items %}
+                        <sw-context-menu-item
+                            variant="danger"
+                            @click="resetSurcharges(item, true)"
+                        >
+                            {{ $tc('sw-product.variations.configuratorModal.resetSurcharges') }}
+                        </sw-context-menu-item>
+                        {% endblock %}
+                    </template>
+                    {% endblock %}
+                </sw-data-grid>
+                {% endblock %}
+            </div>
+            {% endblock %}
+        </div>
+        {% endblock %}
+    </div>
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_product_variants_configurator_prices_loader %}
+    <sw-loader v-if="isLoading" />
+    {% endblock %}
+
+</div>
+{% endblock %}

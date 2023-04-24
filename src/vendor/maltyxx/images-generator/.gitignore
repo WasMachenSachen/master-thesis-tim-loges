@@ -1,0 +1,10 @@
+composer.phar
+composer.lock
+vendor
+.buildpath
+.project
+.settings/
+
+!var/.gitkeep
+var/
+/nbproject/

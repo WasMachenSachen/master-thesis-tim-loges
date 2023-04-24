@@ -1,0 +1,88 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_tagged_field %}
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_order_promotion_tag_field %}
+<sw-block-field
+    class="sw-tagged-field sw-order-promotion-tag-field"
+    :class="taggedFieldClasses"
+    v-bind="$attrs"
+    :disabled="disabled"
+    v-on="$listeners"
+>
+    <template #sw-field-input="{ identification, error, disabled, size, setFocusClass, removeFocusClass }">
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_tagged_field_inner %}
+        <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+        <ul
+            class="sw-tagged-field__tag-list"
+            :class="taggedFieldListClasses"
+            @click="setFocus(true)"
+        >
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_order_promotion_tag_field_tag_list %}
+            <li
+                v-for="(item, index) in value"
+                :key="`sw-tagged-field-value--${index}`"
+            >
+
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_order_promotion_tag_field_tag_item %}
+                <sw-label
+                    v-if="item.isInvalid"
+                    :key="item.code + item.isInvalid"
+                    :size="size"
+                    :dismissable="!disabled"
+                    variant="danger"
+                    @selected="setFocus(true)"
+                    @dismiss="dismissTag(item)"
+                >
+                    {{ item.code }}
+                </sw-label>
+
+                <sw-label
+                    v-else
+                    :key="item.code + item.isInvalid"
+                    v-tooltip="{
+                        message: getPromotionCodeDescription(item),
+                        width: 220
+                    }"
+                    :size="size"
+                    :dismissable="!disabled"
+                    @selected="setFocus(true)"
+                    @dismiss="dismissTag(item)"
+                >
+                    {{ item.code }}
+                </sw-label>
+                {% endblock %}
+            </li>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_order_promotion_tag_field_item_input %}
+            <li>
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_order_promotion_tag_field_input %}
+                <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
+                <input
+                    ref="taggedFieldInput"
+                    v-model="newTagName"
+                    type="text"
+                    class="sw-tagged-field__input"
+                    :class="taggedFieldInputClasses"
+                    :disabled="disabled"
+                    :placeholder="placeholder"
+                    @focus="setFocus(true)"
+                    @blur="setFocus(false)"
+                    @keydown="performAddTag"
+                >
+                {% endblock %}
+            </li>
+            {% endblock %}
+        </ul>
+        {% endblock %}
+    </template>
+</sw-block-field>
+{% endblock %}
+{% endblock %}

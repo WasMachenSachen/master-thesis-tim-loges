@@ -1,0 +1,68 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_text_field %}
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_url_field %}
+<sw-contextual-field
+    class="sw-field--url"
+    v-bind="$attrs"
+    :error="combinedError"
+    :name="formFieldName"
+    @inheritance-restore="$emit('inheritance-restore', $event)"
+    @inheritance-remove="$emit('inheritance-remove', $event)"
+>
+    <template #sw-contextual-field-prefix="{ disabled }">
+        <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+        <span
+            class="sw-field__url-input__prefix"
+            :class="prefixClass"
+            @click="changeMode(disabled)"
+        >
+            <sw-icon
+                v-if="sslActive"
+                name="regular-lock"
+                :small="true"
+            />
+            <sw-icon
+                v-else
+                name="regular-lock-open"
+                :small="true"
+            />
+            {{ urlPrefix }}
+        </span>
+    </template>
+
+    <template #sw-field-input="{ identification, error, disabled, size, setFocusClass, removeFocusClass }">
+        <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
+        <input
+            :id="identification"
+            type="url"
+            class="sw-url-input-field__input"
+            :name="identification"
+            :value="currentValue|unicodeUri"
+            :placeholder="placeholder"
+            :disabled="disabled"
+            @input="onInput"
+            @focus="setFocusClass"
+            @blur="onBlur($event); removeFocusClass();"
+        >
+    </template>
+
+    <template
+        v-if="copyable"
+        #sw-contextual-field-suffix="{ identification }"
+    >
+        <sw-field-copyable
+            v-if="copyable"
+            :display-name="identification"
+            :copyable-text="currentValue"
+            :tooltip="copyableTooltip"
+        />
+    </template>
+
+    <template #label>
+        <slot name="label"></slot>
+    </template>
+
+</sw-contextual-field>
+    {% endblock %}
+{% endblock %}

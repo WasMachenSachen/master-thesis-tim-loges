@@ -1,0 +1,41 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_custom_field_type_base_content %}
+
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_custom_field_type_select_options %}{% endblock %}
+
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_custom_field_type_select_add_option %}{% endblock %}
+
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_custom_field_type_select_multi %}{% endblock %}
+
+{% parent() %}
+
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_custom_field_type_entity_type %}
+<sw-single-select
+    v-model="currentCustomField.config.entity"
+    :disabled="!currentCustomField._isNew"
+    :help-text="$tc('sw-settings-custom-field.customField.detail.helpTextEntitySelect')"
+    :label="$tc('sw-settings-custom-field.customField.detail.labelEntityTypeSelect')"
+    :options="sortedEntityTypes"
+    show-clearable-button
+    @change="onChangeEntityType"
+/>
+{% endblock %}
+
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_custom_field_type_entity_multi %}
+<sw-field
+    v-model="multiSelectSwitch"
+    type="switch"
+    class="sw-custom-field-detail__switch"
+    :disabled="!currentCustomField._isNew"
+    :help-text="$tc('sw-settings-custom-field.customField.detail.helpTextMultiSelect')"
+    :label="$tc('sw-settings-custom-field.customField.detail.labelMultiSelect')"
+    @change="onChangeMultiSelectSwitch"
+/>
+    {% endblock %}
+
+{% endblock %}

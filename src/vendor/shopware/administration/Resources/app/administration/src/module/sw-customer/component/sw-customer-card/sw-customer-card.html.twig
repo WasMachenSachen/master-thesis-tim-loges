@@ -1,0 +1,263 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_customer_card %}
+<sw-card
+    class="sw-customer-card"
+    position-identifier="sw-customer"
+    :title="title"
+    :is-loading="isLoading"
+>
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_customer_card_rows %}
+    <template #grid>
+        <sw-container rows="auto auto">
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_customer_card_row_primary %}
+            <sw-card-section divider="bottom">
+                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                {% block sw_customer_card_metadata_container %}
+                <sw-container
+                    columns="80px 1fr max-content"
+                    gap="0px 30px"
+                >
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_customer_card_avatar %}
+                    <sw-avatar
+                        size="80px"
+                        :source-context="customer"
+                        :first-name="customer.firstName"
+                        :last-name="customer.lastName"
+                    />
+                    {% endblock %}
+
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_customer_card_metadata %}
+                    <div class="sw-customer-card__metadata">
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_card_metadata_customer_name %}
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_custsomer_card_metadata_customer_name_label %}
+                        <template v-if="!editMode">
+                            <div
+                                v-if="customer"
+                                class="sw-customer-card__metadata-customer-name"
+                            >
+                                {{ fullName }}
+                                <sw-label
+                                    v-if="customer.guest"
+                                    appearance="pill"
+                                    size="small"
+                                    class="sw-customer-card__metadata-customer-guest-label"
+                                >
+                                    {{ $tc('sw-customer.card.labelGuest') }}
+                                </sw-label>
+                            </div>
+                        </template>
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_card_metadata_customer_name_editor %}
+                        <div v-else>
+                            <sw-container
+                                columns="1fr 1fr"
+                                gap="10px"
+                            >
+                                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                                {% block sw_customer_card_account_type_field %}
+                                <sw-single-select
+                                    v-model="customer.accountType"
+                                    class="sw-customer-card__account-type-select"
+                                    :label="$tc('sw-customer.customerType.labelAccountType')"
+                                    :placeholder="$tc('sw-customer.customerType.placeholderAccountType')"
+                                    :options="accountTypeOptions"
+                                />
+                                {% endblock %}
+
+                                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                                {% block sw_customer_card_metadata_customer_name_editor_salutation %}
+                                <sw-entity-single-select
+                                    v-model="customer.salutationId"
+                                    class="sw-customer-card__salutation-select"
+                                    entity="salutation"
+                                    label-property="displayName"
+                                    :label="$tc('sw-customer.card.labelSalutation')"
+                                    :criteria="salutationCriteria"
+                                    show-clearable-button
+                                />
+                                {% endblock %}
+
+                                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                                {% block sw_customer_card_metadata_customer_name_editor_title %}
+                                <sw-text-field
+                                    v-model="customer.title"
+                                    :label="$tc('sw-customer.card.labelTitle')"
+                                    :placeholder="$tc('sw-customer.card.placeholderTitle')"
+                                />
+                                {% endblock %}
+                            </sw-container>
+
+                            <sw-container
+                                columns="1fr 1fr"
+                                gap="10px"
+                            >
+                                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                                {% block sw_customer_card_metadata_customer_name_editor_first_name %}
+                                <sw-text-field
+                                    v-model="customer.firstName"
+                                    :label="$tc('sw-customer.card.labelFirstName')"
+                                    validation="required"
+                                    required
+                                    :error="customerFirstNameError"
+                                    :placeholder="$tc('sw-customer.card.placeholderFirstName')"
+                                />
+                                {% endblock %}
+
+                                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                                {% block sw_customer_card_metadata_customer_name_editor_last_name %}
+                                <sw-text-field
+                                    v-model="customer.lastName"
+                                    :label="$tc('sw-customer.card.labelLastName')"
+                                    validation="required"
+                                    required
+                                    :error="customerLastNameError"
+                                    :placeholder="$tc('sw-customer.card.placeholderLastName')"
+                                />
+                                {% endblock %}
+                            </sw-container>
+
+                            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                            {% block sw_customer_card_metadata_customer_name_editor_company %}
+                            <sw-text-field
+                                v-model="customer.company"
+                                :required="isBusinessAccountType"
+                                :error="customerCompanyError"
+                                :label="$tc('sw-customer.card.labelCompany')"
+                                :placeholder="$tc('sw-customer.card.placeholderCompany')"
+                            />
+                            {% endblock %}
+                        </div>
+                        {% endblock %}
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_card_vat_ids %}
+                        <sw-text-field
+                            v-if="editMode && isBusinessAccountType"
+                            v-model="customer.vatIds[0]"
+                            name="vatId"
+                            :label="$tc('sw-customer.card.labelVatId')"
+                            :placeholder="$tc('sw-customer.card.placeholderVatId')"
+                            :error="customerVatIdsError"
+                        />
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_card_metadata_customer_email %}
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_card_metadata_customer_email_label %}
+                        <div
+                            v-if="customer.email && !editMode"
+                            class="sw-customer-card__metadata-item "
+                        >
+                            <a
+                                class="sw-customer-card-email-link"
+                                :href="getMailTo(customer.email)"
+                            >{{ customer.email }}</a>
+                        </div>
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_card_metadata_customer_email_editor %}
+                        <sw-email-field
+                            v-else
+                            v-model="customer.email"
+                            validation="required"
+                            required
+                            :label="$tc('sw-customer.card.labelEmail')"
+                            :placeholder="$tc('sw-customer.card.placeholderEmail')"
+                            :error="customerEmailError"
+                        />
+                        {% endblock %}
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_card_password %}
+                        <sw-password-field
+                            v-if="editMode"
+                            v-model="customer.passwordNew"
+                            autocomplete="new-password"
+                            :disabled="customer.guest"
+                            :label="$tc('sw-profile.index.labelNewPassword')"
+                            :placeholder="$tc('sw-customer.card.placeholderNewPassword')"
+                            :error="customerPasswordError"
+                        />
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_card_password_confirm %}
+                        <sw-password-field
+                            v-if="editMode"
+                            v-model="customer.passwordConfirm"
+                            autocomplete="new-password"
+                            :disabled="customer.guest"
+                            :label="$tc('sw-profile.index.labelNewPasswordConfirm')"
+                            :placeholder="$tc('sw-customer.card.placeholderNewPasswordConfirm')"
+                            :error="customerPasswordConfirmError"
+                        />
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_card_metadata_customer_tag %}
+                        <sw-entity-tag-select
+                            v-model="customer.tags"
+                            :label="editMode ? $tc('sw-customer.baseForm.labelTags') : ''"
+                            class="sw-customer-card__tag-select"
+                            :disabled="!editMode"
+                            :size="editMode ? 'default' : 'medium'"
+                        />
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_card_metadata_additional %}
+                        <slot name="metadata-additional">
+                            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                            {% block sw_customer_card_slot_metadata_additional %}{% endblock %}
+                        </slot>
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block sw_customer_card_actions %}
+                        <div
+                            v-if="hasActionSlot"
+                            class="sw-customer-card__actions"
+                        >
+                            <slot name="actions">
+                                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                                {% block sw_customer_card_slot_actions %}{% endblock %}
+                            </slot>
+                        </div>
+                        {% endblock %}
+                    </div>
+
+                    {% endblock %}
+                </sw-container>
+                {% endblock %}
+            </sw-card-section>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_customer_card_row_secondary %}
+            <sw-card-section
+                secondary
+                slim
+            >
+                <slot name="default">
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block sw_customer_card_slot_default %}{% endblock %}
+                </slot>
+            </sw-card-section>
+            {% endblock %}
+        </sw-container>
+    </template>
+    {% endblock %}
+</sw-card>
+{% endblock %}

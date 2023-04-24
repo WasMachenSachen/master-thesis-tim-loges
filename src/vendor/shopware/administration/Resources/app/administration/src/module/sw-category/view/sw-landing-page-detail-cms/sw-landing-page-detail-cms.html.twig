@@ -1,0 +1,24 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_landing_page_detail_cms %}
+<div class="sw-landing-page-detail__cms">
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_landing_page_detail_cms_layout %}
+    <sw-category-layout-card
+        v-bind="{ cmsPage, isLoading }"
+        :category="landingPage"
+        :page-types="['landingpage']"
+        :headline="$tc('sw-landing-page.base.cms.cmsLayoutModalHeadline')"
+    />
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_landing_page_detail_cms_form %}
+    <sw-cms-page-form
+        v-if="cmsPage"
+        :page="cmsPage"
+    />
+    {% endblock %}
+
+</div>
+{% endblock %}

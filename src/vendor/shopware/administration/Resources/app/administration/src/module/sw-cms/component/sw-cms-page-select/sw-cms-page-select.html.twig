@@ -1,0 +1,14 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_cms_page_select %}
+<div class="sw-cms-page-select">
+    <sw-entity-single-select
+        v-bind="bind"
+        ref="component"
+        v-model="currentValue"
+        class="sw-cms-page-select-box"
+        entity="cms_page"
+        :criteria="pageTypeCriteria"
+        show-clearable-button
+    />
+</div>
+{% endblock %}

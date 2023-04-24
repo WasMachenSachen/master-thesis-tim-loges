@@ -1,0 +1,40 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_cms_block_gallery_buybox_preview %}
+<div class="sw-cms-preview-gallery-buybox">
+    <div class="sw-cms-preview-gallery-buybox__gallery">
+        <div class="sw-cms-preview-gallery-buybox__images">
+            <img
+                :src="'/administration/static/img/cms/preview_glasses_small.jpg' | asset"
+                alt=""
+            >
+            <img
+                :src="'/administration/static/img/cms/preview_glasses_small.jpg' | asset"
+                alt=""
+            >
+            <img
+                :src="'/administration/static/img/cms/preview_glasses_small.jpg' | asset"
+                alt=""
+            >
+        </div>
+
+        <div class="sw-cms-preview-gallery-buybox__slider">
+            <sw-icon
+                name="regular-chevron-left-xs"
+                size="12"
+            />
+            <img
+                :src="'/administration/static/img/cms/preview_glasses_small.jpg' | asset"
+                alt=""
+            >
+            <sw-icon
+                name="regular-chevron-right-xs"
+                size="12"
+            />
+        </div>
+    </div>
+
+    <div class="sw-cms-preview-gallery-buybox__buybox">
+        <sw-cms-el-preview-buy-box />
+    </div>
+</div>
+{% endblock %}

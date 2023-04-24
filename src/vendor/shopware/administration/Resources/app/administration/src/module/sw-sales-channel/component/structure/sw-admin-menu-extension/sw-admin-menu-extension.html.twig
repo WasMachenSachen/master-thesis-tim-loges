@@ -1,0 +1,6 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_admin_menu_navigation_main %}
+{% parent %}
+
+<sw-sales-channel-menu v-if="canViewSalesChannels" />
+{% endblock %}

@@ -1,0 +1,86 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_product_detail_cross_selling %}
+<div v-if="isLoading">
+    <sw-skeleton />
+    <sw-skeleton />
+</div>
+
+<div
+    v-else
+    class="sw-product-detail-cross-selling"
+>
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_product_detail_cross_selling_items_wrapper %}
+    <template v-if="showCrossSellingCard">
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_product_detail_cross_selling_items %}
+        <ul class="sw-product-detail-cross-selling__cross-selling-list">
+            <sw-product-cross-selling-form
+                v-for="item in product.crossSellings"
+                :key="item.id"
+                :cross-selling="item"
+                :allow-edit="acl.can('product.editor')"
+            />
+        </ul>
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_product_detail_cross_selling_add %}
+        <sw-button
+            v-tooltip="{
+                message: onAddCrossSellingTooltipMessage,
+                disabled: acl.can('product.editor') && isSystemDefaultLanguage,
+                showOnDisabledElements: true
+            }"
+            class="sw-product-detail-cross-selling__add-btn"
+            variant="ghost"
+            :disabled="!acl.can('product.editor') || !isSystemDefaultLanguage"
+            @click="onAddCrossSelling"
+        >
+            {{ $tc('sw-product.crossselling.buttonAddCrossSelling') }}
+        </sw-button>
+        {% endblock %}
+    </template>
+    {% endblock %}
+
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_product_detail_empty_state %}
+    <sw-card
+        v-else
+        position-identifier="sw-product-detail-cross-selling-empty-state"
+    >
+        <sw-empty-state
+            :title="$tc('sw-product.crossselling.cardTitleCrossSelling')"
+            :subline="$tc('sw-product.crossselling.emptyStateDescription')"
+            :absolute="false"
+            empty-module
+        >
+            <template #icon>
+                <img
+                    :src="'/administration/static/img/empty-states/products-empty-state.svg' | asset"
+                    :alt="$tc('sw-product.crossselling.cardTitleCrossSelling')"
+                >
+            </template>
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_product_detail_empty_state_cross_selling_add %}
+            <template #actions>
+                <sw-button
+                    v-tooltip="{
+                        message: onAddCrossSellingTooltipMessage,
+                        disabled: acl.can('product.editor') && isSystemDefaultLanguage,
+                        showOnDisabledElements: true
+                    }"
+                    variant="ghost"
+                    :disabled="!acl.can('product.editor') || !isSystemDefaultLanguage"
+                    @click="onAddCrossSelling"
+                >
+                    {{ $tc('sw-product.crossselling.buttonAddCrossSelling') }}
+                </sw-button>
+            </template>
+            {% endblock %}
+        </sw-empty-state>
+    </sw-card>
+    {% endblock %}
+</div>
+{% endblock %}
