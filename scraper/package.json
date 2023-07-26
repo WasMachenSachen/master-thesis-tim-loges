@@ -1,0 +1,23 @@
+{
+  "name": "scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@json2csv/plainjs": "^7.0.1",
+    "axios": "^1.4.0",
+    "cheerio": "^1.0.0-rc.12",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.3.1",
+    "jsdom": "^22.1.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "openai": "^3.3.0"
+  }
+}
