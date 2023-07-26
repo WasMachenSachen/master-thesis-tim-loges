@@ -29,8 +29,9 @@ services:
     environment:
       # default = 0, recommended to be OFF for frontend devs
       - XDEBUG_ENABLED=1
+      - XDEBUG_CONFIG=idekey=vsc
       # default = latest PHP, optional = specific version
-      - PHP_VERSION=8.1
+      - PHP_VERSION=8.2
 
 volumes:
   db_volume:
