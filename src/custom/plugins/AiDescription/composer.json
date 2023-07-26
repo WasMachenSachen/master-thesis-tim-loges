@@ -8,6 +8,9 @@
 			"AiDescription\\": "src/"
 		}
 	},
+	"require": {
+		"guzzlehttp/guzzle": "^7.0"
+	},
 	"extra": {
 		"shopware-plugin-class": "AiDescription\\AiDescription",
 		"label": {

@@ -6,4 +6,8 @@ use Shopware\Core\Framework\Plugin;
 
 class AiDescription extends Plugin
 {
+    public function executeComposerCommands(): bool
+    {
+        return true;
+    }
 }
