@@ -32,6 +32,8 @@ services:
       - XDEBUG_CONFIG=idekey=vsc
       # default = latest PHP, optional = specific version
       - PHP_VERSION=8.2
+    command: bash -c "cd /var/www && make watch-admin"
+
 
 volumes:
   db_volume:
