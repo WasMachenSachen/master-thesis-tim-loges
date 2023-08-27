@@ -5,6 +5,47 @@
   xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
   <services>
+    <!-- id=Namespace\className -->
+    <service id="AiDescription\AiDescription" />
+    <service id="AiDescription\Service\ReadingData">
+      <argument type="service" id="product.repository" />
+    </service>
 
+    <service id="AiDescription\Service\CallApi">
+      <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+    </service>
+
+    <!-- Routing -->
+    <!-- you have to clear the cache everytime something is changed here! bin/console cache:clear -->
+    <service id="AiDescription\Controller\TestController" public="true">
+      <argument type="service" id="logger" />
+      <argument type="service" id="AiDescription\Service\ReadingData" />
+      <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+      <call method="setContainer">
+        <argument type="service" id="service_container" />
+      </call>
+    </service>
+
+    <service id="AiDescription\Controller\SettingsController" public="true">
+      <argument type="service" id="AiDescription\Service\ReadingData" />
+      <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+      <call method="setContainer">
+        <argument type="service" id="service_container" />
+      </call>
+    </service>
+
+    <service id="AiDescription\Controller\GeneratorController" public="true">
+      <!-- <argument type="service" id="AiDescription\Service\ReadingData" />
+      <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" /> -->
+      <argument type="service" id="AiDescription\Service\CallApi" />
+      <call method="setContainer">
+        <argument type="service" id="service_container" />
+      </call>
+    </service>
+    <!-- Commands -->
+    <service id="AiDescription\Command\ExampleCommand">
+      <tag name="console.command" />
+      <argument type="service" id="AiDescription\Service\CallApi" />
+    </service>
   </services>
 </container>
