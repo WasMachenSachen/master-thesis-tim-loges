@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
-    <card>
-        <title>#AiDescription2# Settings</title>
-        <title lang="de-DE">#AiDescription2# Einstellungen</title>
-
-        <input-field type="bool">
-            <name>active</name>
-            <label>Active</label>
-            <label lang="de-DE">Aktiviert</label>
-        </input-field>
-    </card>
+  xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
+  <card>
+    <title>Ai Description</title>
+    <input-field type="text">
+      <name>apikey</name>
+      <label>Api Key</label>
+    </input-field>
+    <component name="sw-entity-multi-id-select">
+      <name>excludedProperties</name>
+      <entity>property_group</entity>
+      <label>Folgende Eigenschaften sollen standardmäßig ausgeschloßen werden:</label>
+    </component>
+  </card>
 </config>
