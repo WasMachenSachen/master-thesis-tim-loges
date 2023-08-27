@@ -2,6 +2,9 @@
     <sw-page class="swag-example-list">
         <template slot="content">
             <h2>Menu entry page</h2>
+            <sw-button @click="callServiceFunction()" :disabled="false" :square="false" :block="false" :isLoading="false">
+              test
+            </sw-button>
         </template>
     </sw-page>
 {% endblock %}
