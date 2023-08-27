@@ -33,12 +33,18 @@ async function scrapeUrl(url) {
 const data = [];
 
 async function scrapeUrls(urls) {
+	console.time();
 	for (const url of urls) {
 		const scrapedData = await scrapeUrl(url);
+		// timeout to not get blocked
+		await new Promise((resolve) => setTimeout(resolve, 500));
+
 		if (scrapedData) {
+			console.log(`scraped url: ${url}`);
 			data.push(scrapedData);
 		}
 	}
+	console.timeEnd();
 }
 
 scrapeUrls(urls)
