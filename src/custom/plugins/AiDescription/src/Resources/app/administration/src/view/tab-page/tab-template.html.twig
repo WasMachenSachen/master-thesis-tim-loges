@@ -1,3 +1,39 @@
-<sw-card title="Custom">
-    TAB
-</sw-card>
+<div>
+	<sw-card :large="true" title="Konfiguration" subtitle="Erklärung">
+		<div class="">
+			<div>
+				<sw-text-editor label="Automatisch generirte Beschreibung" value=""/>
+				<div class="aidescription-footer">
+					<div class="aidescription-footer__button-group">
+						<sw-button @click="generateDescription">Regenerate</sw-button>
+						<sw-button @click="getExcludedProperties">Duplizieren</sw-button>
+					</div>
+					<div class="aidescription-footer__button-group">
+						<sw-button :square="true">
+							<sw-icon name="solid-chevron-left" :small="true"></sw-icon>
+						</sw-button>
+						<sw-button :square="true" :disabled="true">
+							<sw-icon name="solid-chevron-right" :small="true"></sw-icon>
+						</sw-button>
+					</div>
+				</div>
+			</div>
+
+			<sw-text-editor label="Original Beschreibung" :value="entity?.description ?? ''" :disabled="true"/>
+		</div>
+	</sw-card>
+	<sw-card :large="true" title="Konfiguration" subtitle="Erklärung">
+		<div>
+			<div>
+				<sw-single-select :disableSearchFunction="true" v-model="currentSelection" label="Tonalität" :options="options" @change="onChangeTona">
+					<sw-help-text :width="200" toolTipposition="top" :showDelay="100" :hideDelay="100">
+						Lorem ipsum dolor sit amet
+					</sw-help-text>
+				</sw-single-select>
+			</div>
+			<div ref="propertyListing">
+				<sw-checkbox-field  v-for="(item, index) in properties" :key="index" v-model="item.checked" :label="item.description +': '+ item.options[0].name"></sw-checkbox-field>
+			</div>
+		</div>
+	</sw-card>
+</div>
