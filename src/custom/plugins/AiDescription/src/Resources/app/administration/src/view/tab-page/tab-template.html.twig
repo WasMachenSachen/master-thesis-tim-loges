@@ -2,10 +2,10 @@
 	<sw-card :large="true" title="Konfiguration" subtitle="Erklärung">
 		<div class="">
 			<div>
-				<sw-text-editor label="Automatisch generirte Beschreibung" value=""/>
+				<sw-text-editor label="Automatisch generirte Beschreibung" v-model="currentDescription"/>
 				<div class="aidescription-footer">
 					<div class="aidescription-footer__button-group">
-						<sw-button @click="generateDescription">Regenerate</sw-button>
+						<sw-button @click="generateDescription">{{ currentDescription ? 'Neu Generieren' : 'Generieren' }}</sw-button>
 						<sw-button @click="getExcludedProperties">Duplizieren</sw-button>
 					</div>
 					<div class="aidescription-footer__button-group">

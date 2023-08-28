@@ -23,6 +23,7 @@ Shopware.Component.register("tab-page", {
 		return {
 			entity: null,
 			currentSelection: "a",
+			currentDescription: "",
 			properties: [],
 			excludedProperties: [],
 			groupIds: [],
@@ -84,14 +85,27 @@ Shopware.Component.register("tab-page", {
 		isSelected(value) {
 			console.log(value);
 		},
-		generateDescription() {
+		async generateDescription() {
 			const config = {
 				tonality: this.options.find((option) => option.value === this.currentSelection).label ?? "Professionell",
-				properties: [],
+				properties: this.properties,
 			};
-
-			console.log(this.$refs.propertyListing);
+			// Post to /api/aidescription/generateDescription with the config as body
+			const response = await fetch("/api/aidescription/generateDescription", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${this.loginService.getToken()}`,
+				},
+				body: JSON.stringify(config),
+			});
+			const data = await response.json();
+			console.log(data);
+			const content = JSON.parse(data.generateDescription);
+			console.log(content.choices[0].text);
+			this.currentDescription = content.choices[0].text;
 		},
+
 		duplicateDescription() {},
 		previousDescription() {},
 		nextDescription() {},
@@ -130,20 +144,24 @@ Shopware.Component.register("tab-page", {
 				});
 		},
 		async getExcludedProperties() {
-			const response = await fetch("/api/aidescription/exludedProperties", {
-				headers: {
-					Authorization: `Bearer ${this.loginService.getToken()}`,
-				},
-			});
-			const data = await response.json();
-			this.excludedProperties = data.excludedProperties ?? [];
-			console.log(data);
+			try {
+				const response = await fetch("/api/aidescription/exludedProperties", {
+					headers: {
+						Authorization: `Bearer ${this.loginService.getToken()}`,
+					},
+				});
+				const data = await response.json();
+				return data.excludedProperties ?? [];
+			} catch (error) {
+				console.error(error);
+				return [];
+			}
 		},
 	},
 	async created() {
 		const criteria = new Criteria().addAssociation("properties");
 		try {
-			await this.getExcludedProperties();
+			this.excludedProperties = await this.getExcludedProperties();
 			this.entity = await this.productRepository.get(this.id, Shopware.Context.api, criteria);
 			this.getGroupIds();
 			this.properties = await this.getProperties();
