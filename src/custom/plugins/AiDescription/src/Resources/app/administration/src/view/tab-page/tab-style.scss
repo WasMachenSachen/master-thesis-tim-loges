@@ -6,3 +6,9 @@
   display: flex;
   gap: 20px;
 }
+#aidescription-generated-editor {
+  span[data-change="true"] {
+    background-color: red;
+    color: white;
+  }
+}
