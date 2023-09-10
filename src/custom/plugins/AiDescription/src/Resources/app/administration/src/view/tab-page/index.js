@@ -1,5 +1,6 @@
 import template from "./tab-template.html.twig";
 import "./tab-style.scss";
+
 const { Criteria } = Shopware.Data;
 
 Shopware.Component.register("tab-page", {
@@ -23,7 +24,8 @@ Shopware.Component.register("tab-page", {
 		return {
 			entity: null,
 			currentSelection: "a",
-			currentDescription: "",
+			currentDescription:
+				"Sunt dolore reprehenderit est enim fugiat officia officia anim adipisicing laboris qui in anim esse. Duis proident non esse reprehenderit ea. Cupidatat officia ut voluptate quis voluptate dolor reprehenderit anim ea sit do ex nisi elit aliquip. Duis irure deserunt id esse ipsum aliqua esse exercitation aliquip aliquip id occaecat do magna. Voluptate aliquip velit consequat in dolore cillum ullamco ad. Ad mollit amet aute consectetur veniam in commodo eu pariatur tempor fugiat est ipsum dolor labore. Sint minim enim ullamco consequat dolore occaecat tempor. Ex reprehenderit ut aliqua sit velit culpa cupidatat nostrud cupidatat aliqua proident.",
 			properties: [],
 			excludedProperties: [],
 			groupIds: [],
@@ -198,24 +200,25 @@ Shopware.Component.register("tab-page", {
 					title: "Umformulieren",
 					/* platzhalter icon, da sparkles in dieser version anscheinend nicht dabei ist */
 					icon: "solid-circle-download",
-					// tag: "span",
+					tag: "span",
 					value: "red",
 					handler: (button, parent = null) => {
 						this.markParagraphs(button, parent);
 					},
 				},
-				// {
-				// 	type: "undo",
-				// 	title: this.$tc("sw-text-editor-toolbar.title.undo"),
-				// 	icon: "regular-undo-xs",
-				// 	position: "middle",
-				// },
-				// {
-				// 	type: "redo",
-				// 	title: this.$tc("sw-text-editor-toolbar.title.redo"),
-				// 	icon: "regular-redo-xs",
-				// 	position: "middle",
-				// },
+				{
+					// undo doesnt work after switch edit mode - remove button
+					type: "undo",
+					title: this.$tc("sw-text-editor-toolbar.title.undo"),
+					icon: "regular-undo-xs",
+					position: "middle",
+				},
+				{
+					type: "redo",
+					title: this.$tc("sw-text-editor-toolbar.title.redo"),
+					icon: "regular-redo-xs",
+					position: "middle",
+				},
 			],
 		};
 	},
@@ -251,44 +254,67 @@ Shopware.Component.register("tab-page", {
 	methods: {
 		markParagraphs(button, parent) {
 			console.log("markParagraphs");
-			console.log(button);
-			console.log(parent);
-			console.log(this.getSelectedText());
-			this.wrapSelectedTextWithSpan();
+			this.toggleSpan();
 		},
-		getSelectedText() {
+		toggleSpan() {
+			const selection = window.getSelection();
+			const editorElement = document.querySelector("#aidescription-generated-editor");
+			// if nothing is selected or the selection is outside the custom editor do not transform the selection
+			if (!editorElement && selection.rangeCount === 0) return;
+
+			const range = selection.getRangeAt(0);
+			const spanElements = editorElement.querySelectorAll("span");
+
+			let isPartOfSpan = false;
 			let selectedText = "";
-			if (window.getSelection) {
-				// Check if the method is supported by the browser
-				selectedText = window.getSelection().toString();
-			} else if (document.selection && document.selection.type != "Control") {
-				// For older IE versions
-				selectedText = document.selection.createRange().text;
+
+			// check if the selection contains any text and build the selectedText
+			if (range.toString().trim() !== "") {
+				selectedText = range.toString();
 			}
-			return selectedText;
-		},
-		wrapSelectedTextWithSpan() {
-			let selectedText = this.getSelectedText();
-			if (selectedText) {
-				const span = document.createElement("span");
-				span.setAttribute("data-change", "true");
-				span.textContent = selectedText;
-				const range = this.getSelectedRange();
-				if (range) {
-					range.deleteContents();
-					range.insertNode(span);
+
+			// we have to "walk" through all span elements and check if inside the selection is part of a span. we cant use the selection.containsNode() because it doesnt work for partial selections
+			for (const spanElement of spanElements) {
+				const spanRange = document.createRange();
+				spanRange.selectNodeContents(spanElement);
+
+				if (range.intersectsNode(spanElement)) {
+					isPartOfSpan = true;
+					break;
+				}
+			}
+			/*
+			 * we have the following cases:
+			 * 1. the selection contains only text -> wrap it inside a span
+			 * 2. the selection contains some text and a partial of a span -> ignore the selection and remove the span while preserving its content at the same place
+			 * 3. the selection contains a partial of a span and then some text -> same as before
+			 * 4. the selection contains some text and a hole span and then again some text -> same as before
+			 *
+			 * a partial would be something like "This is a <span>test</span> text" and the selection is "test text"
+			 * we want to check for partials, so a user can select something that is already "marked" for regeneration and undo it
+			 */
+			if (!isPartOfSpan && selectedText !== "") {
+				// case 1: the selection only contains text and is not a partial of another span.
+				const newSpan = document.createElement("span");
+				newSpan.setAttribute("data-change", "true");
+				range.surroundContents(newSpan);
+			} else {
+				// case 2, 3 and 4
+				for (const spanElement of spanElements) {
+					const spanRange = document.createRange();
+					spanRange.selectNodeContents(spanElement);
+
+					if (range.intersectsNode(spanElement)) {
+						const fragment = spanRange.extractContents();
+						const parent = spanElement.parentNode;
+
+						parent.insertBefore(fragment, spanElement);
+						parent.removeChild(spanElement);
+					}
 				}
 			}
 		},
-		getSelectedRange() {
-			if (window.getSelection) {
-				const selection = window.getSelection();
-				if (selection.rangeCount > 0) {
-					return selection.getRangeAt(0);
-				}
-			}
-			return null;
-		},
+
 		callServiceFunction() {
 			// this.AiDescription.apiCall();
 		},
@@ -315,10 +341,11 @@ Shopware.Component.register("tab-page", {
 				body: JSON.stringify(config),
 			});
 			const data = await response.json();
-			console.log(data);
-			const content = JSON.parse(data.generateDescription);
-			console.log(content.choices[0].text);
-			this.currentDescription = content.choices[0].text;
+			// console.log(data);
+			// debugger;
+			// const content = JSON.parse(data);
+			// console.log(content.choices[0].text);
+			this.currentDescription = data.response;
 			this.isLoadingDescription = false;
 		},
 
