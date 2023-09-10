@@ -297,7 +297,9 @@ Shopware.Component.register("tab-page", {
 				// case 1: the selection only contains text and is not a partial of another span.
 				const newSpan = document.createElement("span");
 				newSpan.setAttribute("data-change", "true");
-				range.surroundContents(newSpan);
+				// cant use range.surroundContents(newSpan) cause it will break if the selection contains part of another dom element. see: https://developer.mozilla.org/en-US/docs/Web/API/Range/surroundContents and https://stackoverflow.com/questions/1730967/how-to-wrap-with-html-tags-a-cross-boundary-dom-selection-range
+				newSpan.appendChild(range.extractContents());
+				range.insertNode(newSpan);
 			} else {
 				// case 2, 3 and 4
 				for (const spanElement of spanElements) {
