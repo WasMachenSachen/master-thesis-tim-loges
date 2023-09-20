@@ -30,10 +30,10 @@ class SettingsController extends AbstractController
      */
     public function getExludedProperties(Request $request, Context $contex): JsonResponse
     {
-        $exampleConfig = $this->systemConfigService->get('AiDescription.config.excludedProperties', null);
+        $excludedProperties = $this->systemConfigService->get('AiDescription.config.excludedProperties', null);
         return new JsonResponse(
             [
-                'excludedProperties' => $exampleConfig
+                'excludedProperties' => $excludedProperties
             ]
         );
 
