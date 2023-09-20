@@ -35,10 +35,13 @@ class AiDescriptionDefinition extends EntityDefinition
     {
         return new FieldCollection([
           (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-          (new StringField('description', 'description'))->addFlags(new Required()),
+          (new StringField('content', 'content', 2000))->addFlags(new Required()),
           (new IdField('product_id', 'product_id'))->addFlags(new Required()),
           (new StringField('evaluation', 'evaluation')),
-          (new StringField('settings', 'settings')),
+          (new StringField('used_prompt', 'used_prompt', 2000)),
+          (new StringField('used_configuration', 'used_configuration')),
+          (new StringField('used_attributes', 'used_attributes', 2000)),
+          (new StringField('used_tonality', 'used_tonality')),
           new OneToOneAssociationField('product', 'product_id', 'id', ProductDefinition::class, false),
 
         ]);

@@ -5,23 +5,20 @@ namespace AiDescription\Migration;
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Migration\MigrationStep;
 
-class Migration1695217169AiDescription extends MigrationStep
+class Migration1695220719AiDescription extends MigrationStep
 {
     public function getCreationTimestamp(): int
     {
-        return 1695217169;
+        return 1695220719;
     }
 
     public function update(Connection $connection): void
     {
         $query = <<<SQL
         ALTER TABLE `ai_description_content`
-            CHANGE `description` `content` VARCHAR(255) NOT NULL,
-            DROP COLUMN `settings`,
-            ADD COLUMN `used_prompt` VARCHAR(255),
-            ADD COLUMN `used_configuration` VARCHAR(255),
-            ADD COLUMN `used_attributes` VARCHAR(255);
-            ADD COLUMN `used_tonality` VARCHAR(255),
+            MODIFY `content` VARCHAR(2000) NOT NULL,
+            MODIFY `used_prompt` VARCHAR(2000),
+            MODIFY `used_attributes` VARCHAR(2000);
         SQL;
 
         $connection->executeStatement($query);
