@@ -9,10 +9,15 @@
     <service id="AiDescription\AiDescription" />
     <service id="AiDescription\Service\ReadingData">
       <argument type="service" id="product.repository" />
+      <argument type="service" id="ai_description_content.repository" />
     </service>
-
+    <service id="AiDescription\Service\HistoryService">
+      <argument type="service" id="ai_description_content.repository" />
+    </service>
     <service id="AiDescription\Service\CallApi">
       <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+    </service>
+    <service id="AiDescription\Service\ComposePrompt" class="AiDescription\Service\ComposePrompt">
     </service>
 
     <!-- Routing -->
@@ -38,6 +43,8 @@
       <!-- <argument type="service" id="AiDescription\Service\ReadingData" />
       <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" /> -->
       <argument type="service" id="AiDescription\Service\CallApi" />
+      <argument type="service" id="AiDescription\Service\ComposePrompt" />
+      <argument type="service" id="AiDescription\Service\HistoryService" />
       <call method="setContainer">
         <argument type="service" id="service_container" />
       </call>
@@ -47,5 +54,11 @@
       <tag name="console.command" />
       <argument type="service" id="AiDescription\Service\CallApi" />
     </service>
+
+    <!-- Entities -->
+    <service id="AiDescription\Core\Content\AiDescriptionDefinition">
+      <tag name="shopware.entity.definition" entity="ai_description_content" />
+    </service>
+
   </services>
 </container>
