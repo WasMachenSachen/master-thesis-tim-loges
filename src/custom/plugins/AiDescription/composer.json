@@ -1,6 +1,6 @@
 {
-	"name": "swag/plugin-skeleton",
-	"description": "Skeleton plugin",
+	"name": "gjuce/aidescription",
+	"description": "Ai Description",
 	"type": "shopware-platform-plugin",
 	"license": "MIT",
 	"autoload": {
