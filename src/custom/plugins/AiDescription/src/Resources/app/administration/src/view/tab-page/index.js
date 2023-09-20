@@ -23,6 +23,8 @@ Shopware.Component.register("tab-page", {
 	data() {
 		return {
 			entity: null,
+			history: null,
+			currentHistoryIndex: null,
 			currentSelection: "a",
 			currentDescription:
 				"Sunt dolore reprehenderit est enim fugiat officia officia anim adipisicing laboris qui in anim esse. Duis proident non esse reprehenderit ea. Cupidatat officia ut voluptate quis voluptate dolor reprehenderit anim ea sit do ex nisi elit aliquip. Duis irure deserunt id esse ipsum aliqua esse exercitation aliquip aliquip id occaecat do magna. Voluptate aliquip velit consequat in dolore cillum ullamco ad. Ad mollit amet aute consectetur veniam in commodo eu pariatur tempor fugiat est ipsum dolor labore. Sint minim enim ullamco consequat dolore occaecat tempor. Ex reprehenderit ut aliqua sit velit culpa cupidatat nostrud cupidatat aliqua proident.",
@@ -206,29 +208,30 @@ Shopware.Component.register("tab-page", {
 						this.markParagraphs(button, parent);
 					},
 				},
-				{
-					// undo doesnt work after switch edit mode - remove button
-					type: "undo",
-					title: this.$tc("sw-text-editor-toolbar.title.undo"),
-					icon: "regular-undo-xs",
-					position: "middle",
-				},
-				{
-					type: "redo",
-					title: this.$tc("sw-text-editor-toolbar.title.redo"),
-					icon: "regular-redo-xs",
-					position: "middle",
-				},
+				// {
+				// 	// undo doesnt work after switch edit mode - remove button
+				// 	type: "undo",
+				// 	title: this.$tc("sw-text-editor-toolbar.title.undo"),
+				// 	icon: "regular-undo-xs",
+				// 	position: "middle",
+				// },
+				// {
+				// 	type: "redo",
+				// 	title: this.$tc("sw-text-editor-toolbar.title.redo"),
+				// 	icon: "regular-redo-xs",
+				// 	position: "middle",
+				// },
 			],
 		};
 	},
-	// watch: {
-	// 	properties: {
-	// 		handler() {
-	// 		},
-	// 		deep: true,
-	// 	},
-	// },
+	watch: {
+		currentHistoryIndex: {
+			handler(current, prev) {
+				this.currentDescription = this.history[current - 1].content;
+			},
+			deep: true,
+		},
+	},
 
 	computed: {
 		productRepository() {
@@ -262,24 +265,22 @@ Shopware.Component.register("tab-page", {
 			// if nothing is selected or the selection is outside the custom editor do not transform the selection
 			if (!editorElement && selection.rangeCount === 0) return;
 
-			const range = selection.getRangeAt(0);
+			const userSelectedRange = selection.getRangeAt(0);
+			//this also includes all buttons, but this shouldnt be a problem
 			const spanElements = editorElement.querySelectorAll("span");
 
-			let isPartOfSpan = false;
+			let includesAnotherSpan = false;
 			let selectedText = "";
 
-			// check if the selection contains any text and build the selectedText
-			if (range.toString().trim() !== "") {
-				selectedText = range.toString();
+			// check if the selection contains any text and fill selectedText
+			if (userSelectedRange.toString().trim() !== "") {
+				selectedText = userSelectedRange.toString();
 			}
 
 			// we have to "walk" through all span elements and check if inside the selection is part of a span. we cant use the selection.containsNode() because it doesnt work for partial selections
 			for (const spanElement of spanElements) {
-				const spanRange = document.createRange();
-				spanRange.selectNodeContents(spanElement);
-
-				if (range.intersectsNode(spanElement)) {
-					isPartOfSpan = true;
+				if (userSelectedRange.intersectsNode(spanElement)) {
+					includesAnotherSpan = true;
 					break;
 				}
 			}
@@ -290,28 +291,36 @@ Shopware.Component.register("tab-page", {
 			 * 3. the selection contains a partial of a span and then some text -> same as before
 			 * 4. the selection contains some text and a hole span and then again some text -> same as before
 			 *
-			 * a partial would be something like "This is a <span>test</span> text" and the selection is "test text"
+			 * a partial would be something like "this is a <span>test</span> text" and the selection is "test text"
 			 * we want to check for partials, so a user can select something that is already "marked" for regeneration and undo it
+			 *
+			 * if we try to wrap the text and some part of a span we get a lot of edge cases, so it is way easier to just remove the span and preserve its content.
+			 * also it is not clear how we should proceed if the partial from a span that is not selected is bigger then the selection: should it all be wrapped? should it be removed? should it be split?
+			 * right now the worst case it that the user has select a part again if he originally wanted to extend a marked passage, which is not a big inconvenience.
 			 */
-			if (!isPartOfSpan && selectedText !== "") {
+			if (!includesAnotherSpan && selectedText !== "") {
 				// case 1: the selection only contains text and is not a partial of another span.
 				const newSpan = document.createElement("span");
 				newSpan.setAttribute("data-change", "true");
-				// cant use range.surroundContents(newSpan) cause it will break if the selection contains part of another dom element. see: https://developer.mozilla.org/en-US/docs/Web/API/Range/surroundContents and https://stackoverflow.com/questions/1730967/how-to-wrap-with-html-tags-a-cross-boundary-dom-selection-range
-				newSpan.appendChild(range.extractContents());
-				range.insertNode(newSpan);
+				// edge case: the selection contains another DOM-Element
+				// cant use userSelectedRange.surroundContents(newSpan) cause it will break if the selection contains part of another dom element. see: https://developer.mozilla.org/en-US/docs/Web/API/userSelectedRange/surroundContents and https://stackoverflow.com/questions/1730967/how-to-wrap-with-html-tags-a-cross-boundary-dom-selection-userSelectedRange
+				// extractContents to the rescue: "Partially selected nodes are cloned to include the parent tags necessary to make the document fragment valid."
+				newSpan.appendChild(userSelectedRange.extractContents());
+				userSelectedRange.insertNode(newSpan);
 			} else {
-				// case 2, 3 and 4
+				// turns out we can combine case 2, 3 and 4: just remove the span and preserve its content
 				for (const spanElement of spanElements) {
 					const spanRange = document.createRange();
 					spanRange.selectNodeContents(spanElement);
 
-					if (range.intersectsNode(spanElement)) {
+					if (userSelectedRange.intersectsNode(spanElement)) {
 						const fragment = spanRange.extractContents();
 						const parent = spanElement.parentNode;
 
 						parent.insertBefore(fragment, spanElement);
+						// remove the now empty span
 						parent.removeChild(spanElement);
+						// dont break here, because there could be multiple spans that need to be removed!
 					}
 				}
 			}
@@ -319,6 +328,45 @@ Shopware.Component.register("tab-page", {
 
 		callServiceFunction() {
 			// this.AiDescription.apiCall();
+		},
+		async regenerateDescription() {
+			// check if currentDescription does not contain any span elements -> eg nothing is selected, a regeneration would not do anything
+			if (!this.currentDescription.includes('<span data-change="true">')) {
+				this.$store.dispatch("notification/createNotification", {
+					variant: "error",
+					message: "Keine Passage für eine Umformulierung ausgewählt!",
+				});
+				return;
+			}
+
+			this.isLoadingDescription = true;
+			const config = {
+				tonality: this.options.find((option) => option.value === this.currentSelection).label ?? "Professionell",
+				description: this.currentDescription,
+				product_id: this.entity.id,
+			};
+
+			this.currentDescription = "Beschreibung wird überarbeitet...";
+
+			const response = await fetch("/api/aidescription/regenerateDescription", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${this.loginService.getToken()}`,
+				},
+				body: JSON.stringify(config),
+			});
+			const data = await response.json();
+			console.log(data);
+
+			if (data?.history?.elements) {
+				this.history = this.sortHistory(data.history.elements);
+				this.currentDescription = this.history[this.history.length - 1].content;
+				this.currentHistoryIndex = this.history.length;
+			} else {
+				this.currentDescription = data.response;
+			}
+			this.isLoadingDescription = false;
 		},
 		onChangeTona(value) {
 			console.log(value);
@@ -332,8 +380,9 @@ Shopware.Component.register("tab-page", {
 			const config = {
 				tonality: this.options.find((option) => option.value === this.currentSelection).label ?? "Professionell",
 				properties: this.properties,
+				product_id: this.entity.id,
 			};
-			// Post to /api/aidescription/generateDescription with the config as body
+
 			const response = await fetch("/api/aidescription/generateDescription", {
 				method: "POST",
 				headers: {
@@ -343,17 +392,20 @@ Shopware.Component.register("tab-page", {
 				body: JSON.stringify(config),
 			});
 			const data = await response.json();
-			// console.log(data);
+			console.log(data);
 			// debugger;
 			// const content = JSON.parse(data);
 			// console.log(content.choices[0].text);
-			this.currentDescription = data.response;
+			if (data?.history?.elements) {
+				this.history = this.sortHistory(data.history.elements);
+				this.currentDescription = this.history[this.history.length - 1].content;
+				this.currentHistoryIndex = this.history.length;
+			} else {
+				this.currentDescription = data.response;
+			}
 			this.isLoadingDescription = false;
 		},
 
-		duplicateDescription() {},
-		previousDescription() {},
-		nextDescription() {},
 		publishDescription() {},
 
 		getGroupIds() {
@@ -408,7 +460,20 @@ Shopware.Component.register("tab-page", {
 				return [];
 			}
 		},
+		sortHistory(history) {
+			// convert the history elements object and sort them by createdAt
+			const sortedHistory = Object.values(history);
+
+			// Sort the array by createdAt in ascending order
+			sortedHistory.sort((a, b) => {
+				const dateA = new Date(a.createdAt);
+				const dateB = new Date(b.createdAt);
+				return dateA - dateB;
+			});
+			return sortedHistory;
+		},
 	},
+
 	async created() {
 		const criteria = new Criteria().addAssociation("properties");
 		try {

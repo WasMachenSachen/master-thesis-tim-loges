@@ -2,17 +2,19 @@
 	<sw-card :large="false" title="Konfiguration" subtitle="Erklärung">
 		<div class="">
 			<div>
-				<sw-text-editor id="aidescription-generated-editor" :buttonConfig="buttonConfig" label="Automatisch generirte Beschreibung" v-model="currentDescription" :disabled="isLoadingDescription"/>
+				<sw-text-editor id="aidescription-generated-editor" :buttonConfig="buttonConfig" label="Automatisch generierte Beschreibung" v-model="currentDescription" :disabled="isLoadingDescription"/>
 				<div class="aidescription-footer">
 					<div class="aidescription-footer__button-group">
 						<sw-button @click="generateDescription" :disabled="isLoadingDescription">{{ currentDescription ? 'Neu Generieren' : 'Generieren' }}</sw-button>
-						<sw-button @click="getExcludedProperties" :disabled="isLoadingDescription">Duplizieren</sw-button>
+						<sw-button @click="regenerateDescription" :disabled="isLoadingDescription">Umformulierung starten</sw-button>
+						<sw-button :disabled="isLoadingDescription">Veröffentlichen</sw-button>
 					</div>
 					<div class="aidescription-footer__button-group">
-						<sw-button :square="true">
+						<sw-button @click="currentHistoryIndex --" :square="true" :disabled="currentHistoryIndex <= 1 || isLoadingDescription">
 							<sw-icon name="solid-chevron-left" :small="true"></sw-icon>
 						</sw-button>
-						<sw-button :square="true" :disabled="true">
+              <span v-if="currentHistoryIndex !== null && history !== null">{{ currentHistoryIndex }} von {{ history.length }}</span>
+              <sw-button @click="currentHistoryIndex ++" :square="true" :disabled="!history || currentHistoryIndex >= history.length || isLoadingDescription">
 							<sw-icon name="solid-chevron-right" :small="true"></sw-icon>
 						</sw-button>
 					</div>
@@ -22,13 +24,10 @@
 			<sw-text-editor label="Aktuelle Beschreibung" :value="entity?.description ?? 'Keine Beschreibung vorhanden'" :disabled="true"/>
 		</div>
 	</sw-card>
-	<sw-card :large="true" title="Konfiguration" subtitle="Erklärung">
+	<sw-card :large="false" title="Konfiguration" subtitle="Erklärung">
 		<div>
 			<div>
 				<sw-single-select :disableSearchFunction="true" v-model="currentSelection" label="Tonalität" :options="options" @change="onChangeTona">
-					<sw-help-text :width="200" toolTipposition="top" :showDelay="100" :hideDelay="100">
-						Lorem ipsum dolor sit amet
-					</sw-help-text>
 				</sw-single-select>
 			</div>
 			<div ref="propertyListing">
