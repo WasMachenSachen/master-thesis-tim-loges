@@ -10,7 +10,7 @@
 						<sw-button :disabled="isLoadingDescription">Veröffentlichen</sw-button>
 					</div>
 					<div class="aidescription-footer__button-group">
-						<sw-button @click="currentHistoryIndex --" :square="true" :disabled="currentHistoryIndex <= 1 || isLoadingDescription">
+						<sw-button @click="currentHistoryIndex --" :square="true" :disabled="currentHistoryIndex <= 1 || isLoadingDescription">
 							<sw-icon name="solid-chevron-left" :small="true"></sw-icon>
 						</sw-button>
               <span v-if="currentHistoryIndex !== null && history !== null">{{ currentHistoryIndex }} von {{ history.length }}</span>
@@ -21,7 +21,7 @@
 				</div>
 			</div>
 
-			<sw-text-editor label="Aktuelle Beschreibung" :value="entity?.description ?? 'Keine Beschreibung vorhanden'" :disabled="true"/>
+			<sw-text-editor label="Aktuelle Beschreibung" :value="entity?.description ?? 'Keine aktuelle Beschreibung vorhanden.'" :disabled="true"/>
 		</div>
 	</sw-card>
 	<sw-card :large="false" title="Konfiguration" subtitle="Erklärung">

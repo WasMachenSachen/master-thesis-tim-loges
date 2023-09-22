@@ -205,7 +205,7 @@ Shopware.Component.register("tab-page", {
 					tag: "span",
 					value: "red",
 					handler: (button, parent = null) => {
-						this.markParagraphs(button, parent);
+						this.toggleSpan(button, parent);
 					},
 				},
 				// {
@@ -255,10 +255,6 @@ Shopware.Component.register("tab-page", {
 		},
 	},
 	methods: {
-		markParagraphs(button, parent) {
-			console.log("markParagraphs");
-			this.toggleSpan();
-		},
 		toggleSpan() {
 			const selection = window.getSelection();
 			const editorElement = document.querySelector("#aidescription-generated-editor");
