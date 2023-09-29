@@ -28,8 +28,6 @@ class HistoryService
     {
         // remove unused informations from attributes
         $attributes = [];
-
-        // Iterate through the original array
         foreach ($used_attributes as $item) {
             $newItem = (object)[
               "name" => $item->name,
@@ -40,17 +38,16 @@ class HistoryService
         }
 
         $result = $this->aiDescriptionRepository->create([
-            [
-                      'product_id' => $product_id,
-                      'content' => $content,
-                      'evaluation' => $evaluation,
-                      'used_prompt' => $used_prompt,
-                      'used_configuration' => json_encode($used_configuration),
-                      'used_attributes' => json_encode($attributes),
-                      'used_tonality' => $used_tonality,
-
-                  ]
-              ], $context);
+          [
+            'product_id' => $product_id,
+            'content' => $content,
+            'evaluation' => $evaluation,
+            'used_prompt' => $used_prompt,
+            'used_configuration' => json_encode($used_configuration),
+            'used_attributes' => json_encode($attributes),
+            'used_tonality' => $used_tonality,
+          ]
+        ], $context);
         if ($result instanceof EntityWriteResult && $result->getErrors()) {
             $errors = $result->getErrors();
             $errorMessages = [];

@@ -32,14 +32,17 @@ class GeneratorController extends AbstractController
      */
     public function generateDescription(Request $request, Context $context): JsonResponse
     {
+        /* extract all information from the body */
         $requestData = $this->extractData($request);
+        /* compose the prompts based on the requestData */
         $instructions = $this->composePrompt->composeInstructionsForGeneration($requestData['tonality']);
         $initialMessage = $this->composePrompt->composeMessageForGeneration($requestData['properties']);
+        /* get the description from the OpenAI API */
         $description = $this->getDescription($instructions, $initialMessage);
-
+        /* save the new description and then get all previous descriptions */
         $this->saveDescriptionToHistory($context, $requestData['product_id'], $requestData['tonality'], $requestData['properties'], $description, $instructions);
-
         $currentHistory = $this->history->readHistory($context, $requestData['product_id']);
+
         return new JsonResponse(['response' => $description, 'history' => $currentHistory]);
     }
 
@@ -48,24 +51,30 @@ class GeneratorController extends AbstractController
      */
     public function regenerateDescription(Request $request, Context $context): JsonResponse
     {
-
+        /* extract all information from the body */
         $requestData = $this->extractData($request);
+        /* compose the prompts based on the requestData */
         $instructions = $this->composePrompt->composePromptForRephrasing($requestData['tonality']);
-        try {
-            $response = $this->callApi->callApi($instructions, $requestData['description']);
-        } catch (\Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage(), 'response' =>'Fehler beim Generieren der Beschreibung']);
-        }
-        $response = json_decode($response);
-        $description = $response->choices[0]->message->content;
-        $placeholderProperties = [];
+        /* get the description from the OpenAI API */
+        $description = $this->getDescription($instructions, $requestData['description']);
+        /* save the new description and then get all previous descriptions */
+        $placeholderProperties = []; // we dont send the properties for the rephrasing, so for now use an empty string as a placeholder
         $this->saveDescriptionToHistory($context, $requestData['product_id'], $requestData['tonality'], $placeholderProperties, $description, $instructions);
-
         $currentHistory = $this->history->readHistory($context, $requestData['product_id']);
 
         return new JsonResponse(['response' => $description, 'history' => $currentHistory]);
 
     }
+    /**
+     * Saves the description to the history.
+     *
+     * @param Context $context The context object.
+     * @param string $productId The product ID.
+     * @param string $tonality The tonality.
+     * @param array $properties The properties.
+     * @param string $description The description.
+     * @param string $instructions The instructions.
+     */
     private function saveDescriptionToHistory(Context $context, $productId, $tonality, $properties, $description, $instructions)
     {
         $evaluation = "";
@@ -76,12 +85,19 @@ class GeneratorController extends AbstractController
             return new JsonResponse(['error' => $e->getMessage(), 'response' =>'Fehler beim Speichern der Beschreibung']);
         }
     }
+    /**
+     * Extracts data from the request.
+     *
+     * @param Request $request The request object.
+     *
+     * @return array The extracted data.
+     */
     private function extractData(Request $request): array
     {
         $requestContent = json_decode($request->getContent());
         $tonality = strtolower($requestContent->tonality);
         $product_id = $requestContent->product_id;
-        $properties = $requestContent->properties;
+        $properties = isset($requestContent->properties) ? $requestContent->properties: null;
         $description = isset($requestContent->description) ? $requestContent->description : null;
 
         return [
@@ -91,6 +107,15 @@ class GeneratorController extends AbstractController
             'description' => $description,
         ];
     }
+
+    /**
+     * Generates a description from the OpenAI API.
+     *
+     * @param string $instructions The instructions for the API.
+     * @param string $initialMessage The initial message to send to the API.
+     *
+     * @return string The generated description.
+     */
     private function getDescription($instructions, $initialMessage)
     {
         try {

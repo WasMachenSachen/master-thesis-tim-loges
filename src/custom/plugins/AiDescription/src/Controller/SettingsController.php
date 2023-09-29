@@ -8,7 +8,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
-use AiDescription\Service\ReadingData;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 /**
@@ -16,12 +15,10 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
  */
 class SettingsController extends AbstractController
 {
-    private $readingData;
     private SystemConfigService $systemConfigService;
 
-    public function __construct(ReadingData $readingData, SystemConfigService $systemConfigService)
+    public function __construct(SystemConfigService $systemConfigService)
     {
-        $this->readingData = $readingData;
         $this->systemConfigService = $systemConfigService;
 
     }
