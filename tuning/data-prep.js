@@ -4,7 +4,8 @@ import fs from "fs";
 import { urls } from "./urls.js";
 const timestamp = new Date().getTime();
 
-const selectedUrls = urls.slice(0, 500);
+// const selectedUrls = urls.slice(0, 500);
+const selectedUrls = urls;
 
 const instructions =
 	"Du bist ein Experte für Wein und sollst eine Beschreibung für einen Wein erstellen. Die Beschreibung wird in einem Onlineshop genutzt. Die Beschreibung soll 200 Wörter lang sein. Es soll eine Auswahl der passenden Speisen vorkommen. Nehme die Aromen und Düfte mit in die Beschreibung auf.";
@@ -121,9 +122,4 @@ function writeToJsonLine() {
 			console.log("JSONL file written successfully.");
 		}
 	});
-}
-
-async function uploadToOpenAI() {
-	const openai = new OpenAI();
-	await openai.files.create({ file: fs.createReadStream("mydata.jsonl"), purpose: "fine-tune" });
 }
