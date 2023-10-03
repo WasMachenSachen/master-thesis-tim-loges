@@ -26,8 +26,7 @@ Shopware.Component.register("tab-page", {
 			history: null,
 			currentHistoryIndex: null,
 			currentSelection: "a",
-			currentDescription:
-				"Sunt dolore reprehenderit est enim fugiat officia officia anim adipisicing laboris qui in anim esse. Duis proident non esse reprehenderit ea. Cupidatat officia ut voluptate quis voluptate dolor reprehenderit anim ea sit do ex nisi elit aliquip. Duis irure deserunt id esse ipsum aliqua esse exercitation aliquip aliquip id occaecat do magna. Voluptate aliquip velit consequat in dolore cillum ullamco ad. Ad mollit amet aute consectetur veniam in commodo eu pariatur tempor fugiat est ipsum dolor labore. Sint minim enim ullamco consequat dolore occaecat tempor. Ex reprehenderit ut aliqua sit velit culpa cupidatat nostrud cupidatat aliqua proident.",
+			currentDescription: "",
 			properties: [],
 			excludedProperties: [],
 			groupIds: [],
@@ -198,12 +197,9 @@ Shopware.Component.register("tab-page", {
 					tag: "a",
 				},
 				{
-					// type: "hiliteColor",
 					title: "Umformulieren",
-					/* platzhalter icon, da sparkles in dieser version anscheinend nicht dabei ist */
+					/* platzhalter icon, da sparkles in dieser sw version nicht dabei ist */
 					icon: "solid-circle-download",
-					tag: "span",
-					value: "red",
 					handler: (button, parent = null) => {
 						this.toggleSpan(button, parent);
 					},
@@ -222,6 +218,9 @@ Shopware.Component.register("tab-page", {
 				// 	position: "middle",
 				// },
 			],
+			explanation: "",
+			explanationConfig:
+				"Nutze die Tonalität um die Formulierungen der Texte zu beinflussen. Die Eigenschaften können an- und abgewählt werden. Nur die ausgewählten Eigenschaften werden explizit im Text genannt. Alle anderen werden nur genutzt, um den Wein besser zu verstehen.",
 		};
 	},
 	watch: {
@@ -322,9 +321,6 @@ Shopware.Component.register("tab-page", {
 			}
 		},
 
-		callServiceFunction() {
-			// this.AiDescription.apiCall();
-		},
 		async regenerateDescription() {
 			// check if currentDescription does not contain any span elements -> eg nothing is selected, a regeneration would not do anything
 			if (!this.currentDescription.includes('<span data-change="true">')) {
@@ -342,7 +338,7 @@ Shopware.Component.register("tab-page", {
 				product_id: this.entity.id,
 			};
 
-			this.currentDescription = "Beschreibung wird überarbeitet...";
+			this.currentDescription = "Beschreibung wird überarbeitet... Seite nicht verlassen!";
 
 			const response = await fetch("/api/aidescription/regenerateDescription", {
 				method: "POST",
@@ -372,7 +368,7 @@ Shopware.Component.register("tab-page", {
 		},
 		async generateDescription() {
 			this.isLoadingDescription = true;
-			this.currentDescription = "Beschreibung wird erstellt...";
+			this.currentDescription = "Beschreibung wird erstellt... Seite nicht verlassen!";
 			const config = {
 				tonality: this.options.find((option) => option.value === this.currentSelection).label ?? "Professionell",
 				properties: this.properties,
@@ -388,10 +384,7 @@ Shopware.Component.register("tab-page", {
 				body: JSON.stringify(config),
 			});
 			const data = await response.json();
-			console.log(data);
-			// debugger;
-			// const content = JSON.parse(data);
-			// console.log(content.choices[0].text);
+
 			if (data?.history?.elements) {
 				this.history = this.sortHistory(data.history.elements);
 				this.currentDescription = this.history[this.history.length - 1].content;
@@ -402,7 +395,10 @@ Shopware.Component.register("tab-page", {
 			this.isLoadingDescription = false;
 		},
 
-		publishDescription() {},
+		publishDescription() {
+			this.entity.description = this.currentDescription;
+			Shopware.State.commit("swProductDetail/setProduct", this.entity);
+		},
 
 		getGroupIds() {
 			if (!this.entity?.id) {
@@ -436,6 +432,23 @@ Shopware.Component.register("tab-page", {
 					// this.isPropertiesLoading = false;
 				});
 		},
+		async getHistory() {
+			const response = await fetch("/api/aidescription/history", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${this.loginService.getToken()}`,
+				},
+				body: JSON.stringify({ product_id: this.entity.id }),
+			});
+			const data = await response.json();
+
+			if (data.history) {
+				this.history = this.sortHistory(data.history.elements);
+				this.currentDescription = this.history[this.history.length - 1].content;
+				this.currentHistoryIndex = this.history.length;
+			}
+		},
 		/**
 		 *
 		 * @async
@@ -460,7 +473,6 @@ Shopware.Component.register("tab-page", {
 			// convert the history elements object and sort them by createdAt
 			const sortedHistory = Object.values(history);
 
-			// Sort the array by createdAt in ascending order
 			sortedHistory.sort((a, b) => {
 				const dateA = new Date(a.createdAt);
 				const dateB = new Date(b.createdAt);
@@ -480,6 +492,7 @@ Shopware.Component.register("tab-page", {
 			this.properties.forEach((property) => {
 				property.checked = !this.excludedProperties.includes(property.id);
 			});
+			this.getHistory();
 		} catch (error) {
 			console.error(error);
 		}
