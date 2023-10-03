@@ -2,6 +2,11 @@
   display: flex;
   justify-content: space-between;
 }
+@media (max-width: 900px) {
+  .aidescription-footer__button-group{
+    flex-direction: column;
+  }
+}
 .aidescription-footer__button-group{
   display: flex;
   gap: 20px;
@@ -15,4 +20,7 @@
   //   background-color: #ef4444;
   //   color: white;
   // }
+}
+.aidescription-previous-editor{
+  margin-top: 20px;
 }
