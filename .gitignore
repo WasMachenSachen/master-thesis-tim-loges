@@ -53,3 +53,4 @@ shopware-plugin/AiDescription/src/Resources/public/administration/css/ai-descrip
 shopware-plugin/AiDescription/src/Resources/public/administration/js/ai-description.js
 shopware-plugin/AiDescription/src/Resources/public/administration/js/ai-description.js.map
 shopware-plugin/AiDescription/src/Resources/public/static/js/ai-description.js.LICENSE.txt
+src/public/bundles/aidescription/administration/js/ai-description.js
