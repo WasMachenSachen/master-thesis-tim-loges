@@ -1,5 +1,5 @@
 <div>
-	<sw-card :large="false" title="Konfiguration" subtitle="Erklärung">
+	<sw-card :large="false" title="Automatische Beschreibungstexte" subtitle="Erklärung">
 		<div class="">
 			<div>
 				<sw-text-editor id="aidescription-generated-editor" :buttonConfig="buttonConfig" label="Automatisch generierte Beschreibung" v-model="currentDescription" :disabled="isLoadingDescription"/>
@@ -7,7 +7,7 @@
 					<div class="aidescription-footer__button-group">
 						<sw-button @click="generateDescription" :disabled="isLoadingDescription">{{ currentDescription ? 'Neu Generieren' : 'Generieren' }}</sw-button>
 						<sw-button @click="regenerateDescription" :disabled="isLoadingDescription">Umformulierung starten</sw-button>
-						<sw-button :disabled="isLoadingDescription">Veröffentlichen</sw-button>
+						<sw-button @click="publishDescription" :disabled="isLoadingDescription">Veröffentlichen</sw-button>
 					</div>
 					<div class="aidescription-footer__button-group">
 						<sw-button @click="currentHistoryIndex --" :square="true" :disabled="currentHistoryIndex <= 1 || isLoadingDescription">
@@ -21,18 +21,21 @@
 				</div>
 			</div>
 
-			<sw-text-editor label="Aktuelle Beschreibung" :value="entity?.description ?? 'Keine aktuelle Beschreibung vorhanden.'" :disabled="true"/>
+			<sw-text-editor class="aidescription-previous-editor" label="Aktuelle Beschreibung" :value="entity?.description ?? 'Keine aktuelle Beschreibung vorhanden.'" :disabled="true"/>
 		</div>
 	</sw-card>
-	<sw-card :large="false" title="Konfiguration" subtitle="Erklärung">
+	<sw-card :large="false" title="Konfiguration" :subtitle="explanationConfig">
 		<div>
 			<div>
 				<sw-single-select :disableSearchFunction="true" v-model="currentSelection" label="Tonalität" :options="options" @change="onChangeTona">
 				</sw-single-select>
 			</div>
-			<div ref="propertyListing">
-				<sw-checkbox-field  v-for="(item, index) in properties" :key="index" v-model="item.checked" :label="item.description +': '+ item.options[0].name"></sw-checkbox-field>
-			</div>
+      <div class="sw-field">
+        <div class="sw-field__label">Eigenschaften die genutzt werden:</div>
+          <div ref="propertyListing">
+          <sw-checkbox-field  v-for="(item, index) in properties" :key="index" v-model="item.checked" :label="item.description +': '+ item.options[0].name"></sw-checkbox-field>
+        </div>
+      </div>
 		</div>
 	</sw-card>
 </div>
