@@ -351,6 +351,13 @@ Shopware.Component.register("tab-page", {
 			const data = await response.json();
 			console.log(data);
 
+			if (data.error) {
+				this.$store.dispatch("notification/createNotification", {
+					variant: "error",
+					message: data.error,
+				});
+			}
+
 			if (data?.history?.elements) {
 				this.history = this.sortHistory(data.history.elements);
 				this.currentDescription = this.history[this.history.length - 1].content;
@@ -384,6 +391,13 @@ Shopware.Component.register("tab-page", {
 				body: JSON.stringify(config),
 			});
 			const data = await response.json();
+
+			if (data.error) {
+				this.$store.dispatch("notification/createNotification", {
+					variant: "error",
+					message: data.error,
+				});
+			}
 
 			if (data?.history?.elements) {
 				this.history = this.sortHistory(data.history.elements);
@@ -443,7 +457,7 @@ Shopware.Component.register("tab-page", {
 			});
 			const data = await response.json();
 
-			if (data.history) {
+			if (data.history.elements.length > 0) {
 				this.history = this.sortHistory(data.history.elements);
 				this.currentDescription = this.history[this.history.length - 1].content;
 				this.currentHistoryIndex = this.history.length;
