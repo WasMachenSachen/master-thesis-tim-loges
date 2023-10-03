@@ -38,7 +38,13 @@ class GeneratorController extends AbstractController
         $instructions = $this->composePrompt->composeInstructionsForGeneration($requestData['tonality']);
         $initialMessage = $this->composePrompt->composeMessageForGeneration($requestData['properties']);
         /* get the description from the OpenAI API */
-        $description = $this->getDescription($instructions, $initialMessage);
+        try {
+            $response = $this->callApi->callApi($instructions, $initialMessage);
+            $response = json_decode($response);
+            $description = $response->choices[0]->message->content;
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage(), 'response' =>'Fehler beim Generieren der Beschreibung']);
+        }
         /* save the new description and then get all previous descriptions */
         $this->saveDescriptionToHistory($context, $requestData['product_id'], $requestData['tonality'], $requestData['properties'], $description, $instructions);
         $currentHistory = $this->history->readHistory($context, $requestData['product_id']);
@@ -56,7 +62,13 @@ class GeneratorController extends AbstractController
         /* compose the prompts based on the requestData */
         $instructions = $this->composePrompt->composePromptForRephrasing($requestData['tonality']);
         /* get the description from the OpenAI API */
-        $description = $this->getDescription($instructions, $requestData['description']);
+        try {
+            $response = $this->callApi->callApi($instructions, $requestData['description']);
+            $response = json_decode($response);
+            $description = $response->choices[0]->message->content;
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage(), 'response' =>'Fehler beim Generieren der Beschreibung']);
+        }
         /* save the new description and then get all previous descriptions */
         $placeholderProperties = []; // we dont send the properties for the rephrasing, so for now use an empty string as a placeholder
         $this->saveDescriptionToHistory($context, $requestData['product_id'], $requestData['tonality'], $placeholderProperties, $description, $instructions);
@@ -82,6 +94,7 @@ class GeneratorController extends AbstractController
         try {
             $this->history->writeHistory($context, $productId, $description, $evaluation, $instructions, $used_configuration, $properties, $tonality);
         } catch (\Exception $e) {
+            //FIXME: this JsonResponse is not returned to the frontend
             return new JsonResponse(['error' => $e->getMessage(), 'response' =>'Fehler beim Speichern der Beschreibung']);
         }
     }
@@ -106,24 +119,5 @@ class GeneratorController extends AbstractController
             'properties' => $properties,
             'description' => $description,
         ];
-    }
-
-    /**
-     * Generates a description from the OpenAI API.
-     *
-     * @param string $instructions The instructions for the API.
-     * @param string $initialMessage The initial message to send to the API.
-     *
-     * @return string The generated description.
-     */
-    private function getDescription($instructions, $initialMessage)
-    {
-        try {
-            $response = $this->callApi->callApi($instructions, $initialMessage);
-        } catch (\Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage(), 'response' =>'Fehler beim Generieren der Beschreibung']);
-        }
-        $response = json_decode($response);
-        return $response->choices[0]->message->content;
     }
 }
