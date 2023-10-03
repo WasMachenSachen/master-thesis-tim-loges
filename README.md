@@ -1,56 +1,40 @@
 # Begleit Repository zur Masterabeit "Konzeption und Entwicklung einer automatisierten Lösung zur Generierung von Beschreibungstexten für Wein im E-Commerce Bereich auf Basis strukturierter Produktdaten"
 
-docker-compose up -d
+## Benutzung plugin
 
-connect to container shell
+Um das Plugin zu testen wird hier eine Beispiel Shopware Installation zur Verfügung gestellt. Diese basiert auf der Entwicklungsumgebung [Dockware](https://docs.dockware.io/).
 
-## docware watcher
+Der Quellcode des Plugins ist in `./shopware-plugin/AiDescription`. Dieser wird automatisch in den Shopware Development injected.
 
-use this! next one not working. to lazy to debug
+Für die erste Benutzung muss folgender Ablauf durchlaufen werden:
 
-```bash
-cd /var/www
-make watch-admin
-```
+1. Starten des Docker-Containers: `docker-compose up`
+2. An den Docker-Container anhängen: `docker exec -it CONATINER_NAME /bin/bash` (`docker ps` für eine Auflistung der Docker-Container)
+3. `cd /var/www/html`
+4. Installieren des Plugins: `php bin/console plugin:install AiDescription`
+5. Aktivieren des Plugins: `php bin/console plugin:activate AiDescription`
+6. Shopware Cache Löschen: `php bin/console cache:clear`
+7. Login in der Shopware Administration unter `http://localhost:8888/#/login`. Login: admin // Passwort: shopware(Beim ersten Start muss auf das Kompilieren der Plugin-Dateien gewartete werden)
+8. OpenAI API Key in der Plugin Konfiguration eintragen: `http://localhost:8888/#/sw/extension/config/AiDescription`
 
-watcher preview is running at port 8888! not 8080
+Beispielprodukte sind bereits vorhanden, eine Generierung kann auf der Produkt-Einzelseite gestartet werden: `http://localhost:8888/#/sw/product/detail/adfccca13f3b4c0a82739ad8966adf76/ai`. Die Beispieldaten und das Docker Volumen für die MySQL Datenbank liegen in `./shopware-example-store-test-data`.
 
-https://docs.dockware.io/development/watchers
+### Frontend nicht verfügbar
 
-## Shopware watcher
+Es sollte automatisch der integrierte watcher von dockware gestartet werden, sollte das Frontend nicht erreichbar sein muss dieser manuell gestartet werden:
 
-./bin/watch-administration.sh
+1. An den Docker-Container anhängen: `docker exec -it CONATINER_NAME /bin/bash` (`docker ps` für eine Auflistung der Docker-Container)
+2. Watcher starten: `cd /var/www && make watch-admin`
 
-## install and activae
+### Scripte können nicht ausgeführt werden
 
-```bash
-php bin/console plugin:install AiDescription
+Rechte reparieren siehe [docware docs](https://docs.dockware.io/tips-and-tricks/how-to-use-bind-mounting#mac):
+`docker exec -it shop bash -c 'sudo chown www-data:www-data /var/www/html -R'`
 
-php bin/console plugin:activate AiDescription
-```
+## Scraper
 
-# Tuning
+Die Scripte für das Scraping sind in `./scraoer` abgelegt,
+
+## Tuning
 
 Die Scripte für das Tuning sind in `./tuning` abgelegt.
-
-## Vorbereitung der Tuningdaten
-
-Die für das Tuning benötigten Daten werden durch das script `./tuning/data-prep.js` generiert.
-
-**Benutzung:**
-
-1. `cd /tuning`
-2. `.env` anlegen und folgende Variablen füllen:
-   1. `OPENAI_API_KEY`
-3. `npm install`
-4. `node data-prep.js`
-5. Name der erstellten JSONL Datei in `./tuning/tuning.js` eintragen (TRAINING_FILE). Die Funktionen im nächsten Ablauf müssen aus und einkommentiert werden. Es ist nicht sinnvoll erschienen, einen zusätzlichen Aufwand für eine CLI Abfrage zu betreiben.
-   1. `uploadToOpenAI()` ausführen.
-   2. `TRAINING_FILE_ID` eintragen (kommt mit dem Ergebnis aus `uploadToOpenAI()`).
-   3. `initTraining()` ausführen.
-   4. `getTrainingStatus()` ausführen um den Status zu verfolgen.
-6. Nach erfolgreichem Training wird der Initiator per E-Mail benachrichtigt
-
-### Tuningdaten
-
-Die genutzten Trainingsdaten sind in `./tuning/trainind-data` abgelegt. Die Unterordner sind nach der Anzahl der Menge an Beispielen bennant. Die tatsächliche Anzahl der Beispiele ist geringer, da es vorkommen kann, dass Produkte in der URL-Liste nicht mehr vorhanden waren zum Zeitpunkt des Scrapings.
