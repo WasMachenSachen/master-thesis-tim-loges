@@ -41,7 +41,7 @@ Thumbs.db
 /tests/Shopware/TempFiles/
 /cache/
 
-
+/source/
 # SASS/SCSS cache
 .sass-cache/
 
