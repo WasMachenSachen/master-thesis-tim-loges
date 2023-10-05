@@ -1,8 +1,0 @@
-TYPE=TRIGGERS
-triggers='CREATE DEFINER=`root`@`%` TRIGGER customer_address_vat_id_insert AFTER INSERT ON customer_address\n            FOR EACH ROW BEGIN\n                IF NEW.vat_id IS NOT NULL THEN\n                    UPDATE customer SET vat_ids = JSON_ARRAY(NEW.vat_id)\n                        WHERE customer.default_billing_address_id = NEW.id\n                        AND (JSON_CONTAINS(vat_ids, \'"$NEW.vat_id"\') = 0 OR vat_ids IS NULL);\n                END IF;\n            END' 'CREATE DEFINER=`root`@`%` TRIGGER customer_address_vat_id_update AFTER UPDATE ON customer_address\n            FOR EACH ROW BEGIN\n                IF (OLD.vat_id IS NOT NULL AND NEW.vat_id IS NULL) THEN\n                    UPDATE customer SET vat_ids = JSON_REMOVE(vat_ids, JSON_UNQUOTE(JSON_SEARCH(vat_ids, \'one\', OLD.vat_id)))\n                        WHERE customer.default_billing_address_id = NEW.id\n                        AND JSON_SEARCH(vat_ids, \'one\', OLD.vat_id) IS NOT NULL;\n                ELSEIF (OLD.vat_id IS NULL AND NEW.vat_id IS NOT NULL) OR (OLD.vat_id <> NEW.vat_id) THEN\n                    UPDATE customer SET vat_ids = JSON_ARRAY(NEW.vat_id)\n                        WHERE customer.default_billing_address_id = NEW.id\n                        AND (JSON_CONTAINS(vat_ids, \'"$NEW.vat_id"\') = 0 OR vat_ids IS NULL);\n                END IF;\n            END'
-sql_modes=1409286144 1409286144
-definers='root@%' 'root@%'
-client_cs_names='utf8mb4' 'utf8mb4'
-connection_cl_names='utf8mb4_general_ci' 'utf8mb4_general_ci'
-db_cl_names='utf8mb4_unicode_ci' 'utf8mb4_unicode_ci'
-created=167770406753 167770406754

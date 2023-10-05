@@ -15,15 +15,7 @@ services:
       - "db_volume_shopware:/var/lib/mysql"
       - "shop_volume_shopware:/var/www/html"
       - "./shopware-plugin/AiDescription:/var/www/html/custom/plugins/AiDescription"
-      - "/var/www/html/custom/plugins/AiDescription/.git/"
-      - "/var/www/html/custom/plugins/AiDescription/vendor/"
-      - "/var/www/html/custom/plugins/AiDescription/src/Resources/app/administration/node_modules/"
-      - "/var/www/html/custom/plugins/AiDescription/src/Resources/app/storefront/node_modules/"
-      - "/var/www/html/custom/plugins/AiDescription/tests/Cypress/"
-      - "/var/www/html/.git/"
-      - "/var/www/html/public/build"
-      - "/var/www/html/var/cache"
-      - "/var/www/html/vendor"
+      - "./shopware-example-store-test-data/example-store.dump:/var/www/html/mysqldata/example-store.dump"
     networks:
       - web
     environment:
@@ -38,10 +30,6 @@ services:
 volumes:
   db_volume_shopware:
     driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./shopware-example-store-test-data/db_volume
 
   shop_volume_shopware:
     driver: local
