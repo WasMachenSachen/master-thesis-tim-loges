@@ -17,10 +17,16 @@ class Migration1693164634AiDescription extends MigrationStep
         $query = <<<SQL
         CREATE TABLE IF NOT EXISTS `ai_description_content` (
             `id`                BINARY(16)    NOT NULL,
-            `description`   VARCHAR(255)    NOT NULL,
+            `content`        VARCHAR(2000) NOT NULL,
             `product_id`       BINARY(16)    NOT NULL,
             `evaluation`    VARCHAR(255),
             `settings` VARCHAR(255),
+            `created_at` DATETIME(3) NOT NULL,
+            `updated_at` DATETIME(3),
+            `used_prompt` VARCHAR(2000),
+            `used_configuration` VARCHAR(255),
+            `used_attributes` VARCHAR(2000),
+            `used_tonality` VARCHAR(255),
             PRIMARY KEY (`id`),
             FOREIGN KEY (`product_id`) REFERENCES `product`(`id`)
         )
