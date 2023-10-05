@@ -13,9 +13,10 @@ Für die erste Benutzung muss folgender Ablauf durchlaufen werden:
 3. `cd /var/www/html`
 4. Installieren des Plugins: `php bin/console plugin:install AiDescription`
 5. Aktivieren des Plugins: `php bin/console plugin:activate AiDescription`
-6. Shopware Cache Löschen: `php bin/console cache:clear`
-7. Login in der Shopware Administration unter `http://localhost:8888/#/login`. Login: admin // Passwort: shopware(Beim ersten Start muss auf das Kompilieren der Plugin-Dateien gewartete werden)
-8. OpenAI API Key in der Plugin Konfiguration eintragen: `http://localhost:8888/#/sw/extension/config/AiDescription`
+6. Beispiel Produkte einpflegen: `mysql -u root -p shopware < /var/www/html/mysqldata/example-store.dump` (Passwort: root)
+7. Shopware Cache Löschen: `php bin/console cache:clear`
+8. Login in der Shopware Administration unter `http://localhost:8888/#/login`. Login: admin // Passwort: shopware(Beim ersten Start muss auf das Kompilieren der Plugin-Dateien gewartete werden)
+9. OpenAI API Key in der Plugin Konfiguration eintragen: `http://localhost:8888/#/sw/extension/config/AiDescription`
 
 Beispielprodukte sind bereits vorhanden, eine Generierung kann auf der Produkt-Einzelseite gestartet werden: `http://localhost:8888/#/sw/product/detail/adfccca13f3b4c0a82739ad8966adf76/ai`. Die Beispieldaten und das Docker Volumen für die MySQL Datenbank liegen in `./shopware-example-store-test-data`.
 
@@ -33,7 +34,7 @@ Rechte reparieren siehe [docware docs](https://docs.dockware.io/tips-and-tricks/
 
 ## Scraper
 
-Die Scripte für das Scraping sind in `./scraoer` abgelegt,
+Die Scripte für das Scraping sind in `./scraper` abgelegt,
 
 ## Tuning
 
