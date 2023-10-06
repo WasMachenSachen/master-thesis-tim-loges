@@ -16,6 +16,15 @@ services:
       - "shop_volume_shopware:/var/www/html"
       - "./shopware-plugin/AiDescription:/var/www/html/custom/plugins/AiDescription"
       - "./shopware-example-store-test-data/example-store.dump:/var/www/html/mysqldata/example-store.dump"
+      - "/var/www/html/custom/plugins/AiDescription/.git/"
+      - "/var/www/html/custom/plugins/AiDescription/vendor/"
+      - "/var/www/html/custom/plugins/AiDescription/src/Resources/app/administration/node_modules/"
+      - "/var/www/html/custom/plugins/AiDescription/src/Resources/app/storefront/node_modules/"
+      - "/var/www/html/custom/plugins/AiDescription/tests/Cypress/"
+      - "/var/www/html/.git/"
+      - "/var/www/html/public/build"
+      - "/var/www/html/var/cache"
+      - "/var/www/html/vendor"
     networks:
       - web
     environment:
