@@ -47,10 +47,3 @@ Thumbs.db
 
 node_modules/
 *.numbers
-src/public/bundles/aidescription/administration/js/
-src/custom/plugins/AiDescription/src/Resources/public/administration/
-shopware-plugin/AiDescription/src/Resources/public/administration/css/ai-description.css
-shopware-plugin/AiDescription/src/Resources/public/administration/js/ai-description.js
-shopware-plugin/AiDescription/src/Resources/public/administration/js/ai-description.js.map
-shopware-plugin/AiDescription/src/Resources/public/static/js/ai-description.js.LICENSE.txt
-src/public/bundles/aidescription/administration/js/ai-description.js
