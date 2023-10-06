@@ -19,7 +19,9 @@ Für die erste Benutzung muss folgender Ablauf durchlaufen werden:
 
 > Der OpenAI API-Key muss für das Modell GPT-4 freigeschaltet sein!
 
-Beispielprodukte sind nach dem Import vorhanden, eine Generierung kann auf der Produkt-Einzelseite gestartet werden: `http://localhost:8888/#/sw/product/detail/adfccca13f3b4c0a82739ad8966adf76/ai`. Die Beispieldaten der SQL-Dump für die MySQL Datenbank liegen in `./shopware-example-store-test-data`.
+Beispielprodukte sind nach dem Import vorhanden, eine Generierung kann auf der Produkt-Einzelseite gestartet werden: `http://localhost:8888/#/sw/product/detail/adfccca13f3b4c0a82739ad8966adf76/ai`. Die Beispieldaten und der SQL-Dump für die MySQL Datenbank liegen in `./shopware-example-store-test-data`.
+
+> Eine Generierung dauert bis zu 30 Sekunden. Dies ist abhängig von der Auslastung der OpenAI Modelle.
 
 ### Frontend nicht verfügbar
 
