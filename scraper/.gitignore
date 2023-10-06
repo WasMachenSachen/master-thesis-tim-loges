@@ -1,7 +1,4 @@
 .env
-scraped-data/*.**
-results/*.**
 node_modules/
 .DS_Store
-urls.js
 .vscode/launch.json
