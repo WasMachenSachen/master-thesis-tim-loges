@@ -2,6 +2,7 @@
 	"name": "gjuce/aidescription",
 	"description": "Ai Description",
 	"type": "shopware-platform-plugin",
+	"version": "1.0.0",
 	"license": "MIT",
 	"autoload": {
 		"psr-4": {
