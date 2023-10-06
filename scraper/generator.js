@@ -7,7 +7,7 @@ import axios from 'axios';
 
 console.log(process.argv.length);
 if (process.argv.length < 2) {
-  console.error('Please provide the CSV file name and the Model (openai, alephalpha) as a command-line argument.');
+  console.error('Please provide the CSV file name as a command-line argument.');
   process.exit(1);
 }
 
