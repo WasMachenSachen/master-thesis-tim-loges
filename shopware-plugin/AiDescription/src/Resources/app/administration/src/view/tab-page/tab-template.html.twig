@@ -1,5 +1,5 @@
 <div>
-	<sw-card :large="false" title="Automatische Beschreibungstexte" subtitle="Erklärung">
+	<sw-card :large="false" title="Automatische Beschreibungstexte" :subtitle="explanation">
 		<div class="">
 			<div>
 				<sw-text-editor id="aidescription-generated-editor" :buttonConfig="buttonConfig" label="Automatisch generierte Beschreibung" v-model="currentDescription" :disabled="isLoadingDescription"/>
@@ -27,7 +27,7 @@
 	<sw-card :large="false" title="Konfiguration" :subtitle="explanationConfig">
 		<div>
 			<div>
-				<sw-single-select :disableSearchFunction="true" v-model="currentSelection" label="Tonalität" :options="options" @change="onChangeTona">
+				<sw-single-select :disableSearchFunction="true" v-model="currentSelection" label="Tonalität" :options="options">
 				</sw-single-select>
 			</div>
       <div class="sw-field">

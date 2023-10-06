@@ -197,28 +197,16 @@ Shopware.Component.register("tab-page", {
 					tag: "a",
 				},
 				{
-					title: "Umformulieren",
+					title: "Umformulierung markieren",
 					/* platzhalter icon, da sparkles in dieser sw version nicht dabei ist */
 					icon: "solid-circle-download",
 					handler: (button, parent = null) => {
 						this.toggleSpan(button, parent);
 					},
 				},
-				// {
-				// 	// undo doesnt work after switch edit mode - remove button
-				// 	type: "undo",
-				// 	title: this.$tc("sw-text-editor-toolbar.title.undo"),
-				// 	icon: "regular-undo-xs",
-				// 	position: "middle",
-				// },
-				// {
-				// 	type: "redo",
-				// 	title: this.$tc("sw-text-editor-toolbar.title.redo"),
-				// 	icon: "regular-redo-xs",
-				// 	position: "middle",
-				// },
 			],
-			explanation: "",
+			explanation:
+				"Nutze 'Generieren' um einen Text anhand der Konfiguration zu erstellen. In der Menü-Leiste des Editors können ausgewählte Passagen mit 'Umformulierung markieren' ausgewählt werden und dann über die Schaltfläche 'Umformulieren' neu Formuliert werden. Mit der Schaltfläche 'Veröffentlichen' wird der neue Text in die Produktbeschreibung übernommen. Die Änderungen müssen über die Schaltfläche 'Save' gespeichert werden!",
 			explanationConfig:
 				"Nutze die Tonalität um die Formulierungen der Texte zu beinflussen. Die Eigenschaften können an- und abgewählt werden. Nur die ausgewählten Eigenschaften werden explizit im Text genannt. Alle anderen werden nur genutzt, um den Wein besser zu verstehen.",
 		};
@@ -366,12 +354,6 @@ Shopware.Component.register("tab-page", {
 				this.currentDescription = data.response;
 			}
 			this.isLoadingDescription = false;
-		},
-		onChangeTona(value) {
-			console.log(value);
-		},
-		isSelected(value) {
-			console.log(value);
 		},
 		async generateDescription() {
 			this.isLoadingDescription = true;
